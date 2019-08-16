@@ -16,14 +16,13 @@
     "jquery-plugin"
   ],
   "author": "Nikola Stamatovic <nikola.stamatovic@me.com>",
-  "contributors": [
-  ],
+  "contributors": [],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/stamat/jquery.modally/issues"
   },
-  "peerDependencies": {
-    "jquery": ">=1.7.0",
-    "inobounce": ">= 0.2.0"
+  "dependencies": {
+    "inobounce": ">= 0.2.0",
+    "jquery": "^3.4.1"
   }
 }

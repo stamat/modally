@@ -22,6 +22,9 @@
         };
 
         // TODO: events pre open, post open, pre close, post close
+        // TODO: escape key exit
+        // TODO: video play - Youtube, Vimeo
+        // TODO: maybe image lightbox - you have the old code you did for a mexican guy in 2012
 
         // TODO: animation open
         // TODO: animation close
