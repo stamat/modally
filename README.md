@@ -9,3 +9,5 @@ But regardless, **life is short - make reusable code!***
 P.S. Here is an oxymoron for you: I'm one of these people who if they have the time to make something they don't use other people's code, not to have to spend time extending it if god forbids it happens to be needed. Life's not so short now, huh?
 
 [DEMO HERE ⤻](http://stamat.github.io/jquery.modally/)
+
+![Imgur](https://imgur.com/Zzg3FDx.png)
