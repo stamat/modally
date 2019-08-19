@@ -1,6 +1,6 @@
 {
   "name": "modally",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple jQuery plugin for nested modals.",
   "main": "jquery.modally.js",
   "repository": {
