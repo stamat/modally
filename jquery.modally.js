@@ -84,6 +84,7 @@
                 self.$template.find('.iframe-landing').append(self.$spacer);
                 self.$spacer.css({'width': '100%', 'display': 'block'});
                 self.$template.append(self.$embeds);
+                self.$template.addClass('video-embed');
             } else {
                 var ghost = self.$element.detach();
                 self.$template.find('.modally-content').append(ghost);
