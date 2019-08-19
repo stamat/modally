@@ -1,5 +1,8 @@
 (function ($) {
     // https://www.youtube.com/watch?v=gJ-WmYn_9GE
+    window._modally_video_re = {};
+    window._modally_video_re.YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+    window._modally_video_re.VIMEO = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
 
     var Modally = function(id, elem, params) {
         var self = this;
@@ -14,16 +17,18 @@
 
         this.$template = $('<div class="modally-wrap"><div class="modally-table"><div class="modally-cell"><div class="modally-underlay modally-close"></div><div class="modally"><div class="modally-close modally-close-button">×</div><div class="modally-content"></div></div></div></div></div>');
 
+
         var defaults = {
             'max_width': 'none',
             'vertical_align': 'middle',
             'close_parent': false,
             'close_other': false,
+            'video': false,
+            'autoplay': true
         };
 
         // TODO: events pre open, post open, pre close, post close
         // TODO: escape key exit
-        // TODO: video play - Youtube, Vimeo
         // TODO: maybe image lightbox - you have the old code you did for a mexican guy in 2012
 
         // TODO: animation open
@@ -65,8 +70,25 @@
             self.$element.data('modally', self);
             self.$template.data('modally', self);
 
-            var ghost = self.$element.detach();
-            self.$template.find('.modally-content').append(ghost);
+            if (self.params.video) {
+                self.$spacer = $('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAJCAYAAAFMLZykAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAAABFJREFUKBVjYBgFoyFA1RAAAAJTAAEABdnJAAAAAElFTkSuQmCC" />');
+                var ymod = '';
+                var vmod = '';
+                if (self.params.autoplay) {
+                    ymod = 'autoplay=1&amp;';
+                    vmod = 'autoplay=1';
+                }
+                self.$embeds = $('<iframe class="youtube template" data-src="https://www.youtube.com/embed/{ID}?'+ymod+'autohide=1&amp;fs=1&amp;rel=0&amp;hd=1&amp;wmode=opaque&amp;enablejsapi=1" type="text/html" width="1920" height="1080" allow="autoplay" frameborder="0" vspace="0" hspace="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" scrolling="auto></iframe><iframe class="vimeo template" title="vimeo-player" data-src="https://player.vimeo.com/video/{ID}?'+vmod+'" type="text/html" width="1920" height="1080" allow="autoplay; allowfullscreen" rameborder="0" allowfullscreen=""></iframe>');
+                self.$embeds.hide();
+                self.$template.find('.modally-content').append('<div class="iframe-landing"></div>');
+                self.$template.find('.iframe-landing').append(self.$spacer);
+                self.$spacer.css({'width': '100%', 'display': 'block'});
+                self.$template.append(self.$embeds);
+            } else {
+                var ghost = self.$element.detach();
+                self.$template.find('.modally-content').append(ghost);
+            }
+
             self.$template.addClass(self.id);
             self.$template.find('.modally-close').on('click', function(){
                 self.close();
@@ -106,6 +128,35 @@
             // TODO: return to previously closed modal (there is a smart way to do it)
 
             this.$template.css('z-index', data.initial_z_index + 1);
+        }
+
+        if (this.params.video) {
+            var link = $(e.target).data('video');
+            var pts = [];
+            var link_type = null;
+
+			for (var k in window._modally_video_re) {
+				var reg = window._modally_video_re[k];
+
+				var pts_tmp = link.match(reg);
+
+				if (pts_tmp && pts_tmp.length && pts_tmp[1] !== '') {
+				 	pts = pts_tmp;
+					link_type = k;
+					break;
+				}
+			}
+
+            if (pts && pts.length) {
+                var id = pts[1];
+                var $temp = this.$template.find('.template.'+link_type.toLowerCase()).clone();
+                $temp.removeClass('template');
+                $temp.show();
+                var srctemp = $temp.data('src');
+                var src = srctemp.replace('{ID}', id);
+                $temp.attr('src', src);
+                this.$template.find('.iframe-landing').append($temp);
+            }
         }
 
         this.$template.fadeIn();
@@ -148,6 +199,10 @@
 
         if (callback) {
             callback(this, e);
+        }
+
+        if (this.params.video) {
+            this.$template.find('.iframe-landing iframe').remove();
         }
 
         $('body').removeClass('modally-'+this.id);

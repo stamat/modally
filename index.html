@@ -103,6 +103,12 @@
                 border: solid 1px white;
             }
 
+            .button.hollow {
+                background-color: rgba(255,255,255,0);
+                color: white;
+                border: solid 1px white;
+            }
+
             .button.small {
                 height: 44px;
                 line-height: 42px;
@@ -141,6 +147,11 @@
                 .button.white:hover {
                     background-color: rgba(255,255,255,0);
                     color: white;
+                }
+
+                .button.hollow:hover {
+                    background-color: rgba(255,255,255,1);
+                    color: #ff9a9e;
                 }
 
                 .button.gradient:hover {
@@ -190,7 +201,8 @@
                         <div class="cell">
                             <h1 class="serif">MODALLY</h1>
                             <p>It's your trusty jquery nested modals ally.</p>
-                            <a href="#lorem" target="_modal" class="button white">Try me!</a>
+                            <a href="#lorem" target="_modal" class="button white" style="margin-right: 6px;">Try me!</a>
+                            <a href="#video-modal" target="_modal" data-video="https://www.youtube.com/watch?v=gJ-WmYn_9GE" style="margin-left: 6px;" class="button hollow">Video?</a>
                         </div>
                     </div>
                 </div>
@@ -225,6 +237,7 @@
                 $('#ipsum').modally('ipsum', {max_width: 800});
                 $('#lorem').modally();
                 $('#dolor').modally();
+                $('body').modally('video-modal', {video: true, max_width: 800});
             });
         </script>
     </body>

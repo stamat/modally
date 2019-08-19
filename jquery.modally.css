@@ -64,6 +64,19 @@
     position: relative;
 }
 
+.modally .iframe-landing {
+    position: relative
+}
+
+.modally .iframe-landing iframe {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
 @media screen and (min-width: 960px) {
     .modally .modally-close:hover {
         opacity: 0.5;
