@@ -160,6 +160,11 @@
             }
         }
 
+        $('html').addClass('scroll-block');
+        if (window.hasOwnProperty('iNoBounce')) {
+            iNoBounce.enable();
+        }
+
         this.$template.fadeIn();
 
         if (callback) {
@@ -171,6 +176,11 @@
 
     Modally.prototype.close = function(e, callback) {
         this.$template.fadeOut();
+
+        $('html').removeClass('scroll-block');
+        if (window.hasOwnProperty('iNoBounce')) {
+            iNoBounce.disable();
+        }
         this.$template.removeClass('open');
 
         if (this.$template.hasClass('last') && this.temp_parent) {
