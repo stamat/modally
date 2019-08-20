@@ -27,7 +27,6 @@
             'autoplay': true
         };
 
-        // TODO: events pre open, post open, pre close, post close
         // TODO: escape key exit
         // TODO: maybe image lightbox - you have the old code you did for a mexican guy in 2012
 
@@ -43,18 +42,20 @@
     			}
 
                 //check for inline properties
-                var attr = self.$element.attr('modally-'+k)
+                if (self.$element.length) {
+                    var attr = self.$element.attr('modally-'+k)
 
-                if (attr) {
-                    if (k === 'max_width' && attr !== 'none') {
-                        attr = parseInt(attr, 10);
+                    if (attr) {
+                        if (k === 'max_width' && attr !== 'none') {
+                            attr = parseInt(attr, 10);
+                        }
+
+                        if (k === 'close_parent' && attr === 'false') {
+                            attr = false;
+                        }
+
+                        self.params[k] = attr;
                     }
-
-                    if (k === 'close_parent' && attr === 'false') {
-                        attr = false;
-                    }
-
-                    self.params[k] = attr;
                 }
     		}
 
@@ -67,7 +68,9 @@
                 'vertical-align': self.params.vertical_align
             });
 
-            self.$element.data('modally', self);
+            if (self.$element.length) {
+                self.$element.data('modally', self);
+            }
             self.$template.data('modally', self);
 
             if (self.params.video) {
@@ -86,8 +89,10 @@
                 self.$template.append(self.$embeds);
                 self.$template.addClass('video-embed');
             } else {
-                var ghost = self.$element.detach();
-                self.$template.find('.modally-content').append(ghost);
+                if (self.$element.length) {
+                    var ghost = self.$element.detach();
+                    self.$template.find('.modally-content').append(ghost);
+                }
             }
 
             self.$template.addClass(self.id);
@@ -99,6 +104,10 @@
             if (self.initial_z_index === null) {
                 self.initial_z_index = self.$template.css('z-index');
             }
+
+            var event_elem = self.$element.length ? self.$element : $(document);
+            event_elem.trigger('modally:init', self);
+            $(document).trigger('modally:init'+self.id, self);
         }
         __init__();
     };
@@ -165,7 +174,15 @@
             iNoBounce.enable();
         }
 
-        this.$template.fadeIn();
+        var self = this;
+        var event_elem = self.$element.length ? self.$element : $(document);
+        event_elem.trigger('modally:opening', e, this);
+        $(document).trigger('modally:opening:'+this.id, e, this);
+
+        this.$template.fadeIn(function(){
+            event_elem.trigger('modally:opened', e, self);
+            $(document).trigger('modally:opened:'+self.id, e, self);
+        });
 
         if (callback) {
             callback(this, e);
@@ -175,7 +192,15 @@
     };
 
     Modally.prototype.close = function(e, callback) {
-        this.$template.fadeOut();
+        var self = this;
+        var event_elem = self.$element.length ? self.$element : $(document);
+        event_elem.trigger('modally:closing', e, this);
+        $(document).trigger('modally:closing:'+this.id, e, this);
+
+        this.$template.fadeOut(function() {
+            event_elem.trigger('modally:closed', e, self);
+            $(document).trigger('modally:closed:'+self.id, e, self);
+        });
 
         $('html').removeClass('scroll-block');
         if (window.hasOwnProperty('iNoBounce')) {
@@ -227,25 +252,31 @@
             window._modally_storage = {};
         }
 
-		var $this = $(this);
+        var $this = null;
 
-        if (id === undefined || id === null) {
-            id = $this.attr('id');
+        if (!(this instanceof Window)) {
+            $this = $(this);
+
+            if (id === undefined || id === null) {
+                id = $this.attr('id');
+            }
         }
+
 
         if (id === undefined || id === null || id === '') {
             console.error('jquery.modally >> in order to use this plugin you need to provide a unique ID for each modal manually or automatically throughout target element\'s ID attribute.');
             return $this;
         }
 
-        if (!window._modally_storage.hasOwnProperty(id)) {
-            window._modally_storage[id] = new Modally(id, $this, params);
-        } else {
+        if (window._modally_storage.hasOwnProperty(id)) {
             console.warn('jquery.modally >> modal with the provided ID: "' + id +'" already exists. Rewriting.');
         }
+        window._modally_storage[id] = new Modally(id, $this, params);
 
 		return $this;
     };
+
+    window.modally = $.fn.modally;
 
     function _modallyTrigger(e, elem, action) {
         var href = $(elem).attr('href');
