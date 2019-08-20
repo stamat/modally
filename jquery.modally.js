@@ -106,8 +106,8 @@
             }
 
             var event_elem = self.$element.length ? self.$element : $(document);
-            event_elem.trigger('modally:init', self);
-            $(document).trigger('modally:init'+self.id, self);
+            event_elem.trigger('modally:init', [self]);
+            $(document).trigger('modally:init'+self.id, [self]);
         }
         __init__();
     };
@@ -177,11 +177,11 @@
         var self = this;
         var event_elem = self.$element.length ? self.$element : $(document);
         event_elem.trigger('modally:opening', e, this);
-        $(document).trigger('modally:opening:'+this.id, e, this);
+        $(document).trigger('modally:opening:'+this.id, [e, this]);
 
         this.$template.fadeIn(function(){
             event_elem.trigger('modally:opened', e, self);
-            $(document).trigger('modally:opened:'+self.id, e, self);
+            $(document).trigger('modally:opened:'+self.id, [e, self]);
         });
 
         if (callback) {
@@ -195,11 +195,11 @@
         var self = this;
         var event_elem = self.$element.length ? self.$element : $(document);
         event_elem.trigger('modally:closing', e, this);
-        $(document).trigger('modally:closing:'+this.id, e, this);
+        $(document).trigger('modally:closing:'+this.id, [e, this]);
 
         this.$template.fadeOut(function() {
             event_elem.trigger('modally:closed', e, self);
-            $(document).trigger('modally:closed:'+self.id, e, self);
+            $(document).trigger('modally:closed:'+self.id, [e, self]);
         });
 
         $('html').removeClass('scroll-block');
