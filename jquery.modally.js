@@ -24,15 +24,18 @@
             'close_parent': false,
             'close_other': false,
             'video': false,
-            'autoplay': true
+            'autoplay': true,
+            'in_duration': 'normal',
+            'in_easing': 'swing',
+            'out_duration': 'normal',
+            'out_easing': 'swing',
+            'in_css': null, //TODO: css animation
+            'out_css': null //TODO: css animation
         };
 
-        // TODO: escape key exit
         // TODO: maybe image lightbox - you have the old code you did for a mexican guy in 2012
-
-        // TODO: animation open
-        // TODO: animation close
-        // TODO: responsive
+        // TODO: responsive triggers (needs deep extend)
+        // TODO: make a modal manager class, should solve the bulky code on open and close - will also enable to reopen the closed parent
 
         function __init__() {
             for (var k in defaults) {
@@ -41,7 +44,7 @@
     				self.params[k] = defaults[k];
     			}
 
-                //check for inline properties
+                //check for inline properties - not deep
                 if (self.$element.length) {
                     var attr = self.$element.attr('modally-'+k)
 
@@ -112,94 +115,107 @@
         __init__();
     };
 
+    //XXX: This code sucks - REFACTOR
     Modally.prototype.open = function(e, callback) {
         var $parent_modally = $(e.target).closest('.modally-wrap');
+        var self = this;
         $('body').addClass('modally-open modally-'+this.id);
 
         $('.modally-wrap.open').removeClass('last');
         this.$template.addClass('open last');
 
+        function run_open(e, self) {
+            if (self.params.video) {
+                var link = $(e.target).data('video');
+                var pts = [];
+                var link_type = null;
+
+    			for (var k in window._modally_video_re) {
+    				var reg = window._modally_video_re[k];
+
+    				var pts_tmp = link.match(reg);
+
+    				if (pts_tmp && pts_tmp.length && pts_tmp[1] !== '') {
+    				 	pts = pts_tmp;
+    					link_type = k;
+    					break;
+    				}
+    			}
+
+                if (pts && pts.length) {
+                    var id = pts[1];
+                    var $temp = self.$template.find('.template.'+link_type.toLowerCase()).clone();
+                    $temp.removeClass('template');
+                    $temp.show();
+                    var srctemp = $temp.data('src');
+                    var src = srctemp.replace('{ID}', id);
+                    $temp.attr('src', src);
+                    self.$template.find('.iframe-landing').append($temp);
+                }
+            }
+
+            $('html').addClass('scroll-block');
+            if (window.hasOwnProperty('iNoBounce')) {
+                iNoBounce.enable();
+            }
+
+            if (self.$element.length) {
+                self.$element.trigger('modally:opening', e, self);
+            }
+            self.$template.trigger('modally:opening', e, self);
+            $(document).trigger('modally:opening:'+self.id, [e, self]);
+
+            self.$template.stop(true).fadeIn(self.params.in_duration, self.params.in_easing, function(){
+                if (self.$element.length) {
+                    self.$element.trigger('modally:opened', e, self);
+                }
+                self.$template.trigger('modally:opened', e, self);
+                $(document).trigger('modally:opened:'+self.id, [e, self]);
+
+                if (callback && typeof callback === 'function') {
+                    callback();
+                }
+            });
+        }
+
         if ($parent_modally.length) {
             var data = $parent_modally.data('modally');
 
             if (this.params.close_parent) {
-                var self = this;
                 data.close(e, function() {
-                    self.$template.fadeIn();
+                    run_open(e, self);
                 });
-
-                if (callback) {
-                    callback(this, e);
-                }
                 return this;
-            } else {
-                this.temp_parent = data;
             }
-            // TODO: return to previously closed modal (there is a smart way to do it)
 
+            this.temp_parent = data;
             this.$template.css('z-index', data.initial_z_index + 1);
         }
 
-        if (this.params.video) {
-            var link = $(e.target).data('video');
-            var pts = [];
-            var link_type = null;
-
-			for (var k in window._modally_video_re) {
-				var reg = window._modally_video_re[k];
-
-				var pts_tmp = link.match(reg);
-
-				if (pts_tmp && pts_tmp.length && pts_tmp[1] !== '') {
-				 	pts = pts_tmp;
-					link_type = k;
-					break;
-				}
-			}
-
-            if (pts && pts.length) {
-                var id = pts[1];
-                var $temp = this.$template.find('.template.'+link_type.toLowerCase()).clone();
-                $temp.removeClass('template');
-                $temp.show();
-                var srctemp = $temp.data('src');
-                var src = srctemp.replace('{ID}', id);
-                $temp.attr('src', src);
-                this.$template.find('.iframe-landing').append($temp);
-            }
-        }
-
-        $('html').addClass('scroll-block');
-        if (window.hasOwnProperty('iNoBounce')) {
-            iNoBounce.enable();
-        }
-
-        var self = this;
-        var event_elem = self.$element.length ? self.$element : $(document);
-        event_elem.trigger('modally:opening', e, this);
-        $(document).trigger('modally:opening:'+this.id, [e, this]);
-
-        this.$template.fadeIn(function(){
-            event_elem.trigger('modally:opened', e, self);
-            $(document).trigger('modally:opened:'+self.id, [e, self]);
-        });
-
-        if (callback) {
-            callback(this, e);
-        }
+        run_open(e, this);
 
         return this;
     };
 
     Modally.prototype.close = function(e, callback) {
         var self = this;
-        var event_elem = self.$element.length ? self.$element : $(document);
-        event_elem.trigger('modally:closing', e, this);
+
+        if (this.$element.length) {
+            this.$element.trigger('modally:closing', e, this);
+        }
+        this.$template.trigger('modally:closing', e, this);
         $(document).trigger('modally:closing:'+this.id, [e, this]);
 
-        this.$template.fadeOut(function() {
-            event_elem.trigger('modally:closed', e, self);
+        this.$template.stop(true).fadeOut(self.params.out_duration, self.params.out_easing, function() {
+            if (self.$element.length) {
+                self.$element.trigger('modally:closed', e, self);
+            }
+            self.$template.trigger('modally:closed', e, self);
             $(document).trigger('modally:closed:'+self.id, [e, self]);
+
+            if (callback && typeof callback === 'function') {
+                callback();
+            }
         });
 
         $('html').removeClass('scroll-block');
@@ -219,27 +235,14 @@
             $('body').removeClass('modally-open');
         }
 
-        if (this.params.close_parent) {
-            if (callback) {
-                callback(this, e);
-            }
-
-            $('body').removeClass('modally-'+this.id);
-
-            return this;
+        if (this.params.video) {
+            this.$template.find('.iframe-landing iframe').remove();
         }
 
         if (this.initial_z_index !== this.$template.css('z-index')) {
             this.$template.css('z-index', this.initial_z_index);
         }
 
-        if (callback) {
-            callback(this, e);
-        }
-
-        if (this.params.video) {
-            this.$template.find('.iframe-landing iframe').remove();
-        }
 
         $('body').removeClass('modally-'+this.id);
 
@@ -277,6 +280,12 @@
     };
 
     window.modally = $.fn.modally;
+
+    //close last modal on escape
+    $(document).on('keyup', function(e){
+        var $last_modally = $('.modally-wrap.open.last');
+        $last_modally.data('modally').close();
+    });
 
     function _modallyTrigger(e, elem, action) {
         var href = $(elem).attr('href');
