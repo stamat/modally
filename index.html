@@ -6,6 +6,7 @@
         <title>Modally - jQuery Modal Plugin</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <link rel="icon" type="image/png" href="https://i.imgur.com/vqrs5bD.png">
 
         <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Libre+Caslon+Display&display=swap" rel="stylesheet">
 
@@ -43,6 +44,13 @@
             .hero {
                 background-image: linear-gradient(to top, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
                 color: white;
+                background-attachment: fixed;
+                position: relative;
+            }
+
+            .hero p {
+                font-size: 18px;
+                letter-spacing: 0.5px;
             }
 
             .hero .table {
@@ -186,6 +194,29 @@
             .modally .button-wrap .button {
                 margin-left: 16px;
             }
+
+            .github-buttons {
+                position: absolute;
+                top: 0px;
+                right: 0px;
+                padding: 16px;
+            }
+
+            .down {
+                text-align: center;
+                position: absolute;
+                bottom: 0px;
+                left: 0px;
+                width: 100%;
+                line-height: 50px;
+                font-size: 24px;
+                opacity: 0.5;
+                color: white;
+            }
+
+            .down span {
+                display: inline-block;
+            }
         </style>
 
         <link rel="stylesheet" href="jquery.modally.css">
@@ -201,21 +232,25 @@
                     <div class="table">
                         <div class="cell">
                             <h1 class="serif">MODALLY</h1>
-                            <p>It's your trusty jquery nested modals ally.</p>
+                            <p>It's your trusty jQuery nested modals ally.</p>
                             <a href="#lorem" target="_modal" class="button white" style="margin-right: 6px;">Try me!</a>
                             <a href="#video-modal" target="_modal" data-video="https://www.youtube.com/watch?v=u9QJo5fBADE" style="margin-left: 6px;" class="button hollow">Video?</a>
+                            <div class="github-buttons">
+                                <a class="github-button" href="https://github.com/stamat/jquery.modally" data-size="large" aria-label="Download stamat/jquery.modally on GitHub">View on GitHub</a>
+                            </div>
+                            <a href="#main" class="down"><span class="bounce">&darr;</span></a>
                         </div>
                     </div>
                 </div>
                 <div id="lorem" modally-max_width="1000">
-                    <h1 class="modal-title serif">Hey there!</h1>
+                    <h1 class="modal-title">Hey there!</h1>
                     <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Yes I am this lazy.</p>
                     <div class="button-wrap">
                         <a target="_modal:close" class="button small">Close me!</a><a href="#ipsum" target="_modal" class="button gradient small">Open 2nd one!</a>
                     </div>
                 </div>
                 <div id="ipsum">
-                    <h1 class="modal-title serif">You still here?!</h1>
+                    <h1 class="modal-title">You still here?!</h1>
                     <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Yes I am this lazy.</p>
 
                     <div class="button-wrap">
@@ -224,7 +259,7 @@
                 </div>
 
                 <div id="dolor" modally-max_width="500">
-                    <h1 class="modal-title serif">I'm the last one.</h1>
+                    <h1 class="modal-title">I'm the last one.</h1>
                     <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Yes I am this lazy.</p>
 
                     <div class="button-wrap">
@@ -235,11 +270,13 @@
         </div>
         <script type="text/javascript">
             jQuery(document).ready(function() {
-                $('#ipsum').modally('ipsum', {max_width: 800, close_parent: true});
+                $('#ipsum').modally('ipsum', {max_width: 800});
                 $('#lorem').modally();
                 $('#dolor').modally();
                 modally('video-modal', {video: true, max_width: 800});
             });
         </script>
+        <!-- Place this tag in your head or just before your close body tag. -->
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
     </body>
 </html>

@@ -19,6 +19,7 @@
 
 
         var defaults = {
+            'landing': null, //TODO:
             'max_width': 'none',
             'vertical_align': 'middle',
             'close_parent': false,
@@ -36,6 +37,7 @@
         // TODO: maybe image lightbox - you have the old code you did for a mexican guy in 2012
         // TODO: responsive triggers (needs deep extend)
         // TODO: make a modal manager class, should solve the bulky code on open and close - will also enable to reopen the closed parent
+        // TODO: iframe modal
 
         function __init__() {
             for (var k in defaults) {
