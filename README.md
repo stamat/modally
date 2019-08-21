@@ -36,6 +36,10 @@ But regardless, **life is short - make reusable code!**
 
 ## //TODO:
 
+## Tested
+
+Tested with [![BrowserStack](https://imgur.com/wfYoxvC.png)](https://www.browserstack.com/)
+
 ## License
 MIT License
 
