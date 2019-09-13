@@ -92,9 +92,9 @@ Event | Element/s | Description
 
 ## //TODO:
 
-- [x] --Youtube and Vimeo modals--
-- [x] --Close on <ESC> key--
-- [x] --Scrollbar fix on prevent scroll--
+- [x] ~~Youtube and Vimeo modals~~
+- [x] ~~Close on <ESC> key~~
+- [x] ~~Scrollbar fix on prevent scroll~~
 - [ ] Test events, remove multiple triggers
 - [ ] Target element modal template injection
 - [ ] CSS animations
