@@ -95,6 +95,7 @@ Event | Element/s | Description
 - [x] ~~Youtube and Vimeo modals~~
 - [x] ~~Close on <ESC> key~~
 - [x] ~~Scrollbar fix on prevent scroll~~
+- [ ] Fix scroll issue on child modal close
 - [ ] Test events, remove multiple triggers
 - [ ] Target element modal template injection
 - [ ] CSS animations
