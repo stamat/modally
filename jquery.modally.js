@@ -1,4 +1,106 @@
+/*! jquery.modally - v1.0.3
+*   https://github.com/stamat/jquery.modally
+*   by Stamat <nikola.stamatovic@me.com>; Licensed MIT */
 (function ($) {
+    function getScrollWidth() {
+		var $tester = $('<div></div>');
+		var $inner = $('<div></div>');
+
+		$tester.css({
+			  width:	'100px',
+			  height: '100px',
+			  'z-index': 0,
+			  position: 'fixed',
+			  left: '-9999px',
+			  'overflow-x': 'hidden',
+			  'overflow-y': 'scroll'
+		});
+
+		$inner.css({
+		  	'min-height': '10px'
+		});
+
+		$tester.append($inner);
+		$('body').append($tester);
+
+		var scroll_width = $inner.width();
+		$inner.remove();
+		$tester.remove();
+
+		return 100 - scroll_width;
+	}
+
+	var scroll_width = getScrollWidth();
+	var $html = $('html');
+
+	function storePaddingRight($elem) {
+		var padding_right = parseInt($elem.css('padding-right'), 10);
+		$elem.data('padding-right', padding_right);
+		return padding_right;
+	}
+
+	function restorePaddingRight($elem) {
+		var padding_right = $elem.data('padding-right');
+		$elem.css('padding-right', padding_right);
+		$elem.data('padding-right', null);
+		return padding_right;
+	}
+
+	$.fn.paddingFill = function() {
+		var $this = $(this);
+
+		if (scroll_width) {
+			$this.each(function() {
+				var $elem = $(this);
+				var data = $elem.data('padding-right');
+				if (data === null || data === undefined) {
+					$elem.css('padding-right', storePaddingRight($elem) + scroll_width );
+				}
+			});
+		}
+	};
+
+	$.fn.disableScroll = function() {
+		var $this = $(this);
+		if (!$html.data('scroll-blocked')) {
+			$html.css({
+				overflow: 'hidden',
+				height: '100%'
+			});
+			$html.data('scroll-blocked', true);
+		}
+
+		$this.paddingFill();
+	};
+
+	$.fn.undoPaddingFill = function() {
+		var $this = $(this);
+
+		if (scroll_width) {
+			$this.each(function() {
+				var $elem = $(this);
+				var data = $elem.data('padding-right');
+				if (data !== null) {
+					$elem.css('padding-right', restorePaddingRight($elem));
+				}
+			});
+		}
+	};
+
+	$.fn.enableScroll = function() {
+		var $this = $(this);
+
+		$this.undoPaddingFill();
+
+		if ($html.data('scroll-blocked')) {
+			$html.css({
+				overflow: 'auto',
+				height: 'auto'
+			});
+			$html.data('scroll-blocked', false);
+		}
+	};
+
     // https://www.youtube.com/watch?v=gJ-WmYn_9GE
     window._modally_video_re = {};
     window._modally_video_re.YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
@@ -156,7 +258,8 @@
                 }
             }
 
-            $('html').addClass('scroll-block');
+            $('html, .modally-wrap').disableScroll();
+
             if (window.hasOwnProperty('iNoBounce')) {
                 iNoBounce.enable();
             }
@@ -220,7 +323,8 @@
             }
         });
 
-        $('html').removeClass('scroll-block');
+        $('html, .modally-wrap').enableScroll();
+
         if (window.hasOwnProperty('iNoBounce')) {
             iNoBounce.disable();
         }
@@ -266,7 +370,6 @@
                 id = $this.attr('id');
             }
         }
-
 
         if (id === undefined || id === null || id === '') {
             console.error('jquery.modally >> in order to use this plugin you need to provide a unique ID for each modal manually or automatically throughout target element\'s ID attribute.');

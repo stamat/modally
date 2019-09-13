@@ -21,7 +21,7 @@
         "index.html"
     ],
     "dependencies": {
-        "jquery": ">=1.7",
+        "jquery": ">=1.11.3",
         "inobounce": ">= 0.2.0"
     }
 }
