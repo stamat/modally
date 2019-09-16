@@ -2,6 +2,8 @@
 *   https://github.com/stamat/jquery.modally
 *   by Stamat <nikola.stamatovic@me.com>; Licensed MIT */
 (function ($) {
+	var $html = $('html');
+	
     function getScrollWidth() {
 		var $tester = $('<div style="background: blue"></div>');
 		var $inner = $('<div style="background: red"></div>');
@@ -22,7 +24,7 @@
 		});
 
 		$tester.append($inner);
-		$('body').append($tester);
+		$html.append($tester);
 
 		var scroll_width = $inner.width();
 		$inner.remove();
@@ -31,13 +33,7 @@
 		return 100 - scroll_width;
 	}
 
-	var scroll_width = 0;
-	var $html = $('html');
-
-    $(document).ready(function(){
-        $html = $('html');
-        scroll_width = getScrollWidth();
-    });
+	var scroll_width = getScrollWidth();
 
 	function storePaddingRight($elem) {
 		var padding_right = parseInt($elem.css('padding-right'), 10);
@@ -394,8 +390,12 @@
 
     //close last modal on escape
     $(document).on('keyup', function(e){
-        var $last_modally = $('.modally-wrap.open.last');
-        $last_modally.data('modally').close();
+		if (e.which === 27) {
+			var $last_modally = $('.modally-wrap.open.last');
+			if ($last_modally.length) {
+				 $last_modally.data('modally').close();
+			}
+		}
     });
 
     function _modallyTrigger(e, elem, action) {
