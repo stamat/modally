@@ -29,7 +29,6 @@
 	}
 
 	var scroll_width = getScrollWidth();
-	var $html = $('html');
 
 	function storePaddingRight($elem) {
 		var padding_right = parseInt($elem.css('padding-right'), 10);
