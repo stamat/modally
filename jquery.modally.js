@@ -1,10 +1,7 @@
-/*! jquery.modally - v1.0.4
-*   https://github.com/stamat/jquery.modally
-*   by Stamat <nikola.stamatovic@me.com>; Licensed MIT */
 (function ($) {
-    function getScrollWidth() {
-		var $tester = $('<div style="background: blue"></div>');
-		var $inner = $('<div style="background: red"></div>');
+	function getScrollWidth() {
+		var $tester = $('<div></div>');
+		var $inner = $('<div></div>');
 
 		$tester.css({
 			  width:	'100px',
@@ -12,17 +9,17 @@
 			  'z-index': 0,
 			  position: 'fixed',
 			  left: '-9999px',
-              top: 0,
+			  top: 0,
 			  'overflow-x': 'hidden',
 			  'overflow-y': 'scroll'
 		});
 
 		$inner.css({
-		  	'min-height': '10px'
+			'min-height': '10px'
 		});
 
 		$tester.append($inner);
-		$('body').append($tester);
+		$('html').append($tester);
 
 		var scroll_width = $inner.width();
 		$inner.remove();
@@ -31,13 +28,8 @@
 		return 100 - scroll_width;
 	}
 
-	var scroll_width = 0;
+	var scroll_width = getScrollWidth();
 	var $html = $('html');
-
-    $(document).ready(function(){
-        $html = $('html');
-        scroll_width = getScrollWidth();
-    });
 
 	function storePaddingRight($elem) {
 		var padding_right = parseInt($elem.css('padding-right'), 10);
@@ -111,6 +103,7 @@
     window._modally_video_re = {};
     window._modally_video_re.YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
     window._modally_video_re.VIMEO = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
+	window._modally_index = {};
 
     var Modally = function(id, elem, params) {
         var self = this;
@@ -123,7 +116,7 @@
             this.params = {};
         }
 
-        this.$template = $('<div class="modally-wrap"><div class="modally-table"><div class="modally-cell"><div class="modally-underlay modally-close"></div><div class="modally"><div class="modally-close modally-close-button">×</div><div class="modally-content"></div></div></div></div></div>');
+        this.$template = $('<div class="modally-wrap"><div class="modally-table"><div class="modally-cell"><div class="modally-underlay modally-close"></div><div class="modally" role="dialog" aria-modal="true"><button tabindex="1" class="modally-close modally-close-button">&times;</button><div class="modally-content"></div></div></div></div></div>');
 
 
         var defaults = {
@@ -183,6 +176,10 @@
 
             if (self.$element.length) {
                 self.$element.data('modally', self);
+
+				if (self.$element.hasClass('modally-init')) {
+					self.$element.removeClass('modally-init');
+				}
             }
             self.$template.data('modally', self);
 
@@ -221,13 +218,25 @@
             var event_elem = self.$element.length ? self.$element : $(document);
             event_elem.trigger('modally:init', [self]);
             $(document).trigger('modally:init'+self.id, [self]);
+			window._modally_index[id] = self;
         }
         __init__();
     };
 
     //XXX: This code sucks - REFACTOR
     Modally.prototype.open = function(e, callback) {
-        var $parent_modally = $(e.target).closest('.modally-wrap');
+        var $parent_modally = null;
+
+		if (e && !e.hasOwnProperty('currentTarget')) {
+			e  = $(e);
+		}
+
+		if (e && e.hasOwnProperty('currentTarget')) {
+			$parent_modally = $(e.currentTarget).closest('.modally-wrap');
+		} else {
+			$parent_modally = $(e).closest('.modally-wrap');
+		}
+
         var self = this;
         $('body').addClass('modally-open modally-'+this.id);
 
@@ -236,7 +245,7 @@
 
         function run_open(e, self) {
             if (self.params.video) {
-                var link = $(e.target).data('video');
+                var link = $(e.currentTarget).data('video');
                 var pts = [];
                 var link_type = null;
 
@@ -393,25 +402,37 @@
     window.modally = $.fn.modally;
 
     //close last modal on escape
-    $(document).on('keyup', function(e){
-        var $last_modally = $('.modally-wrap.open.last');
-        $last_modally.data('modally').close();
+    $(document).on('keyup', function(e) {
+		if (e.which === 27) {
+			var $last_modally = $('.modally-wrap.open.last');
+			if ($last_modally.length) {
+				 $last_modally.data('modally').close();
+			}
+		}
     });
 
     function _modallyTrigger(e, elem, action) {
-        var href = $(elem).attr('href');
+		var href = null;
+
+		if (typeof elem === 'string') {
+			href = elem;
+		} else {
+			href = $(elem).attr('href');
+		}
 
         if (href === undefined
             || href === null
             || href === ''
             || href === '#') {
             if (action === 'close') {
-                var $parent = $(e.target).closest('.modally-wrap');
-                if ($parent.length) {
-                    var data = $parent.data('modally');
-                    data.close();
-                    return;
-                }
+				if (e) {
+					var $parent = $(e.currentTarget).closest('.modally-wrap');
+	                if ($parent.length) {
+	                    var data = $parent.data('modally');
+	                    data.close();
+	                    return;
+	                }
+				}
             }
 
             console.error('jquery.modally >> href attribute needs to contain the existing modal ID');
@@ -442,4 +463,29 @@
     $(document).on('click', 'a[target="_modal"]', _modallyTriggerOpen);
     $(document).on('click', 'a[target="_modal:open"]', _modallyTriggerOpen);
     $(document).on('click', 'a[target="_modal:close"]', _modallyTriggerClose);
+
+	function modallyHashCheck() {
+		if (window.location.hash !== ''
+			&& window.location.hash !== '#') {
+			href = window.location.hash.replace('#', '');
+
+			if (window._modally_index.hasOwnProperty(href)) {
+				_modallyTrigger(null, href, 'open');
+			}
+
+			console.log(window.location.hash);
+		}
+	}
+
+	$(document).ready(function() {
+		$('.modally-init').each(function(){
+			$(this).modally();
+		});
+
+		modallyHashCheck();
+	});
+
+	$(window).on('hashchange', function() {
+		modallyHashCheck();
+	});
 })(jQuery);
