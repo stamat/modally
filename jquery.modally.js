@@ -27,7 +27,7 @@
 
 		return 100 - scroll_width;
 	}
-
+	var $html = $('html');
 	var scroll_width = getScrollWidth();
 
 	function storePaddingRight($elem) {
