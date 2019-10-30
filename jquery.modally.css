@@ -67,13 +67,6 @@
 
     /* Corrects inability to style clickable `input` types in iOS */
     -webkit-appearance: none;
-
-    /* Remove excess padding and border in Firefox 4+ */
-    &::-moz-focus-inner {
-        border: 0;
-        padding: 0;
-    }
-
     position: absolute;
     top: 0px;
     right: 0px;
@@ -84,6 +77,12 @@
     cursor: pointer;
     transition: opacity 250ms ease-in-out;
     font-weight: 300;
+}
+
+/* Remove excess padding and border in Firefox 4+ */
+.modally .modally-close-button::-moz-focus-inner {
+    border: 0;
+    padding: 0;
 }
 
 .modally-table {
