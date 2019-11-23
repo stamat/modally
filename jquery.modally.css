@@ -53,13 +53,15 @@
 
     background: transparent;
 
-    /* inherit font & color from ancestor */
-    color: inherit;
-    font: inherit;
-    text-align: inherit;
-
-    /* Normalize `line-height`. Cannot be changed from `normal` in Firefox 4+. */
-    line-height: normal;
+	position: absolute;
+    top: 0px;
+    right: 0px;
+    padding: 12px 20px;
+    font-size: 32px;
+    line-height: 23px;
+    opacity: 1;
+    transition: opacity 250ms ease-in-out;
+    font-weight: 300;
 
     /* Corrects font smoothing for webkit */
     -webkit-font-smoothing: inherit;
@@ -73,17 +75,6 @@
         border: 0;
         padding: 0;
     }
-
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    padding: 12px 20px;
-    font-size: 32px;
-    line-height: 23px;
-    opacity: 1;
-    cursor: pointer;
-    transition: opacity 250ms ease-in-out;
-    font-weight: 300;
 }
 
 .modally-table {

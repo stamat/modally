@@ -69,16 +69,16 @@ Modally automatically integrates with [iNoBounce](https://github.com/lazd/iNoBou
 
 Property | Default | Accepts | Description
 -------- | ------- | ------- | -----------
-**max_width** | 'none' | 'none' or number | Defines maximum width of the modal window, just like max-width css property
-**vertical_align** | 'middle' | 'middle' or 'top' or 'bottom' | Vertical orientation of the modal window, like vertical-align css property
-**close_parent** | false | boolean | Whether to close the parent modal window, parent window is automatically selected if a modal open is triggered within another modal
-**close_other** | false | boolean | Wether to close all other opened modals upon opening this modal
+**max-width** | 'none' | 'none' or number | Defines maximum width of the modal window, just like max-width css property
+**vertical-align** | 'middle' | 'middle' or 'top' or 'bottom' | Vertical orientation of the modal window, like vertical-align css property
+**close-parent** | false | boolean | Whether to close the parent modal window, parent window is automatically selected if a modal open is triggered within another modal
+**close-other** | false | boolean | Wether to close all other opened modals upon opening this modal
 **video** | false | boolean | For creating a video modal
 **autoplay** | true | boolean | Whether video modal should autoplay
-**in_duration** | 'normal' | 'slow', 'normal', 'fast' or number of milliseconds | Speed of fade in, uses jQuery.fadeIn
-**in_easing** | 'swing' | string | Easing of fade in, uses jQuery.fadeIn
-**out_duration** | 'normal' | 'slow', 'normal', 'fast' or number of milliseconds | Speed of fade out, uses jQuery.fadeOut
-**out_easing** | 'swing' | string | Easing of fade in, uses jQuery.fadeOut
+**in-duration** | 'normal' | 'slow', 'normal', 'fast' or number of milliseconds | Speed of fade in, uses jQuery.fadeIn
+**in-easing** | 'swing' | string | Easing of fade in, uses jQuery.fadeIn
+**out-duration** | 'normal' | 'slow', 'normal', 'fast' or number of milliseconds | Speed of fade out, uses jQuery.fadeOut
+**out-easing** | 'swing' | string | Easing of fade in, uses jQuery.fadeOut
 
 ## Events
 
@@ -96,8 +96,8 @@ Event | Element/s | Description
 - [x] ~~Close on <ESC> key~~
 - [x] ~~Scrollbar fix on prevent scroll~~
 - [ ] Fix scroll issue on child modal close
-- [ ] Test events, remove multiple triggers
-- [ ] Target element modal template injection
+- [x] ~~Test events, remove multiple triggers~~
+- [x] ~~Target element modal template injection~~
 - [ ] CSS animations
 - [ ] Accessibility W3 aria #1
 - [ ] Image lightbox ability

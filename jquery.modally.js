@@ -28,7 +28,7 @@
 		return 100 - scroll_width;
 	}
 
-	var scroll_width = getScrollWidth();
+	window.scroll_width = getScrollWidth();
 
 	function storePaddingRight($elem) {
 		var padding_right = parseInt($elem.css('padding-right'), 10);
@@ -46,7 +46,7 @@
 	$.fn.paddingFill = function() {
 		var $this = $(this);
 
-		if (scroll_width) {
+		if (window.scroll_width) {
 			$this.each(function() {
 				var $elem = $(this);
 				var data = $elem.data('padding-right');
@@ -59,6 +59,8 @@
 
 	$.fn.disableScroll = function() {
 		var $this = $(this);
+		var $html = $('html');
+
 		if (!$html.data('scroll-blocked')) {
 			$html.css({
 				overflow: 'hidden',
@@ -73,7 +75,7 @@
 	$.fn.undoPaddingFill = function() {
 		var $this = $(this);
 
-		if (scroll_width) {
+		if (window.scroll_width) {
 			$this.each(function() {
 				var $elem = $(this);
 				var data = $elem.data('padding-right');
@@ -86,8 +88,8 @@
 
 	$.fn.enableScroll = function() {
 		var $this = $(this);
-
 		$this.undoPaddingFill();
+		var $html = $('html');
 
 		if ($html.data('scroll-blocked')) {
 			$html.css({
@@ -102,6 +104,9 @@
     window._modally_video_re = {};
     window._modally_video_re.YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
     window._modally_video_re.VIMEO = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
+	//TODO: add support for brightcove and cloudfront
+	//TODO: automatic video modal detection
+
 	window._modally_index = {};
 
     var Modally = function(id, elem, params) {
@@ -119,19 +124,19 @@
 
 
         var defaults = {
-            'landing': null, //TODO:
-            'max_width': 'none',
-            'vertical_align': 'middle',
-            'close_parent': false,
-            'close_other': false,
+            'landing': 'body',
+            'max-width': 'none',
+            'vertical-align': 'middle',
+            'close-parent': false,
+            'close-other': false,
             'video': false,
             'autoplay': true,
-            'in_duration': 'normal',
-            'in_easing': 'swing',
-            'out_duration': 'normal',
-            'out_easing': 'swing',
-            'in_css': null, //TODO: css animation
-            'out_css': null //TODO: css animation
+            'in-duration': 'normal',
+            'in-easing': 'swing',
+            'out-duration': 'normal',
+            'out-easing': 'swing',
+            'in-css': null, //TODO: css animation
+            'out-css': null //TODO: css animation
         };
 
         // TODO: maybe image lightbox - you have the old code you did for a mexican guy in 2012
@@ -151,11 +156,11 @@
                     var attr = self.$element.attr('modally-'+k)
 
                     if (attr) {
-                        if (k === 'max_width' && attr !== 'none') {
+                        if (k === 'max-width' && attr !== 'none') {
                             attr = parseInt(attr, 10);
                         }
 
-                        if (k === 'close_parent' && attr === 'false') {
+                        if (k === 'close-parent' && attr === 'false') {
                             attr = false;
                         }
 
@@ -166,11 +171,11 @@
 
             //setup
             self.$template.find('.modally').css({
-                'max-width': self.params.max_width
+                'max-width': self.params['max-width']
             });
 
             self.$template.find('.modally-cell').css({
-                'vertical-align': self.params.vertical_align
+                'vertical-align': self.params['vertical-align']
             });
 
             if (self.$element.length) {
@@ -179,6 +184,7 @@
 				if (self.$element.hasClass('modally-init')) {
 					self.$element.removeClass('modally-init');
 				}
+				self.$element.show();
             }
             self.$template.data('modally', self);
 
@@ -208,7 +214,8 @@
             self.$template.find('.modally-close').on('click', function(){
                 self.close();
             });
-            $('body').append(self.$template);
+
+            $(self.params.landing).append(self.$template);
 
             if (self.initial_z_index === null) {
                 self.initial_z_index = self.$template.css('z-index');
@@ -216,7 +223,7 @@
 
             var event_elem = self.$element.length ? self.$element : $(document);
             event_elem.trigger('modally:init', [self]);
-            $(document).trigger('modally:init'+self.id, [self]);
+            $(document).trigger('modally:init:'+self.id, [self]);
 			window._modally_index[id] = self;
         }
         __init__();
@@ -233,7 +240,7 @@
 		if (e && e.hasOwnProperty('currentTarget')) {
 			$parent_modally = $(e.currentTarget).closest('.modally-wrap');
 		} else {
-			$parent_modally = $(e).closest('.modally-wrap');
+			$parent_modally = $(e).closest('.modally-wrap'); //XXX: ???
 		}
 
         var self = this;
@@ -244,20 +251,32 @@
 
         function run_open(e, self) {
             if (self.params.video) {
-                var link = $(e.currentTarget).data('video');
+                var link = null;
+
+				if (e && e.hasOwnProperty('currentTarget')) {
+					link = $(e.currentTarget).data('video');
+				} else {
+					var url_pts = /video=([^&]+)/gi.exec(window.location.hash);
+					if (url_pts && url_pts.length && url_pts[1] !== '') {
+						link = url_pts[1];
+					}
+				}
+
                 var pts = [];
                 var link_type = null;
 
     			for (var k in window._modally_video_re) {
     				var reg = window._modally_video_re[k];
 
-    				var pts_tmp = link.match(reg);
+    				var pts_tmp = reg.exec(link);
 
     				if (pts_tmp && pts_tmp.length && pts_tmp[1] !== '') {
     				 	pts = pts_tmp;
     					link_type = k;
     					break;
     				}
+
+					reg.lastIndex = 0;
     			}
 
                 if (pts && pts.length) {
@@ -284,7 +303,7 @@
             self.$template.trigger('modally:opening', e, self);
             $(document).trigger('modally:opening:'+self.id, [e, self]);
 
-            self.$template.stop(true).fadeIn(self.params.in_duration, self.params.in_easing, function(){
+            self.$template.stop(true).fadeIn(self.params['in-duration'], self.params['in-easing'], function(){
                 if (self.$element.length) {
                     self.$element.trigger('modally:opened', e, self);
                 }
@@ -325,7 +344,7 @@
         this.$template.trigger('modally:closing', e, this);
         $(document).trigger('modally:closing:'+this.id, [e, this]);
 
-        this.$template.stop(true).fadeOut(self.params.out_duration, self.params.out_easing, function() {
+        this.$template.stop(true).fadeOut(self.params['out-duration'], self.params['out-easing'], function() {
             if (self.$element.length) {
                 self.$element.trigger('modally:closed', e, self);
             }
@@ -421,8 +440,9 @@
 
         if (href === undefined
             || href === null
-            || href === ''
+            || href.length < 2
             || href === '#') {
+
             if (action === 'close') {
 				if (e) {
 					var $parent = $(e.currentTarget).closest('.modally-wrap');
@@ -442,10 +462,12 @@
             href = href.replace('#', '');
         }
 
-        if (window.hasOwnProperty('_modally_storage') && window._modally_storage.hasOwnProperty(href)) {
+        if (window.hasOwnProperty('_modally_storage')
+			&& window._modally_storage.hasOwnProperty(href)) {
+
             window._modally_storage[href][action](e);
         } else {
-            console.error('jquery.modally >> no modal by provided ID: ' + href);
+            console.error('jquery.modally >> no modal registered by provided ID: ' + href);
         }
     }
 
@@ -466,13 +488,16 @@
 	function modallyHashCheck() {
 		if (window.location.hash !== ''
 			&& window.location.hash !== '#') {
-			href = window.location.hash.replace('#', '');
+			var href = window.location.hash;
+
+			var url_pts = /^#([a-z\_\-]+[a-z0-9\_\-]*)/gi.exec(window.location.hash);
+			if (url_pts && url_pts.length && url_pts[1].length) {
+				href = url_pts[1];
+			}
 
 			if (window._modally_index.hasOwnProperty(href)) {
 				_modallyTrigger(null, href, 'open');
 			}
-
-			console.log(window.location.hash);
 		}
 	}
 
