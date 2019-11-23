@@ -77,6 +77,12 @@
     }
 }
 
+/* Remove excess padding and border in Firefox 4+ */
+.modally .modally-close-button::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
 .modally-table {
     display: table;
     width: 100%;
