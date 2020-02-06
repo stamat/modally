@@ -100,7 +100,7 @@
 		}
 	};
 
-    // https://www.youtube.com/watch?v=gJ-WmYn_9GE
+	// https://www.youtube.com/watch?v=gJ-WmYn_9GE
     window._modally_video_re = {};
     window._modally_video_re.YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
     window._modally_video_re.VIMEO = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
@@ -198,12 +198,12 @@
                     ymod = 'autoplay=1&amp;';
                     vmod = 'autoplay=1';
                 }
-                self.$embeds = $('<iframe class="youtube template" data-src="https://www.youtube.com/embed/{ID}?'+ymod+'autohide=1&amp;fs=1&amp;rel=0&amp;hd=1&amp;wmode=opaque&amp;enablejsapi=1" type="text/html" width="1920" height="1080" allow="autoplay" frameborder="0" vspace="0" hspace="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" scrolling="auto></iframe><iframe class="vimeo template" title="vimeo-player" data-src="https://player.vimeo.com/video/{ID}?'+vmod+'" type="text/html" width="1920" height="1080" allow="autoplay; allowfullscreen" rameborder="0" allowfullscreen=""></iframe>');
-                self.$embeds.hide();
+                self.$embeds = $('<iframe class="youtube template" data-src="https://www.youtube.com/embed/{ID}?'+ymod+'autohide=1&amp;fs=1&amp;rel=0&amp;hd=1&amp;wmode=opaque&amp;enablejsapi=1" type="text/html" width="1920" height="1080" allow="autoplay" frameborder="0" vspace="0" hspace="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" scrolling="auto"></iframe><iframe class="vimeo template" title="vimeo-player" data-src="https://player.vimeo.com/video/{ID}?'+vmod+'" type="text/html" width="1920" height="1080" allow="autoplay; allowfullscreen" rameborder="0" allowfullscreen=""></iframe>');
                 self.$template.find('.modally-content').append('<div class="iframe-landing"></div>');
                 self.$template.find('.iframe-landing').append(self.$spacer);
                 self.$spacer.css({'width': '100%', 'display': 'block'});
                 self.$template.append(self.$embeds);
+				self.$embeds.hide();
                 self.$template.addClass('video-embed');
             } else {
                 if (self.$element.length) {
@@ -283,7 +283,7 @@
 
                 if (pts && pts.length) {
                     var id = pts[1];
-                    var $temp = self.$template.find('.template.'+link_type.toLowerCase()).clone();
+                    var $temp = self.$template.find('iframe.template.'+link_type.toLowerCase()).clone();
                     $temp.removeClass('template');
                     $temp.show();
                     var srctemp = $temp.data('src');
