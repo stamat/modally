@@ -290,7 +290,6 @@
                     $temp.removeClass('template');
                     $temp.show();
                     var srctemp = $temp.data('src');
-                    console.log($temp);
                     var src = srctemp.replace('{ID}', id);
                     $temp.attr('src', src);
                     self.$template.find('.iframe-landing').append($temp);
