@@ -1,113 +1,114 @@
 (function ($) {
-	function getScrollWidth() {
-		var $tester = $('<div></div>');
-		var $inner = $('<div></div>');
+  function getScrollWidth() {
+    var $tester = $('<div></div>');
+    var $inner = $('<div></div>');
 
-		$tester.css({
-			  width:	'100px',
-			  height: '100px',
-			  'z-index': 0,
-			  position: 'fixed',
-			  left: '-9999px',
-			  top: 0,
-			  'overflow-x': 'hidden',
-			  'overflow-y': 'scroll'
-		});
+    $tester.css({
+        width:  '100px',
+        height: '100px',
+        'z-index': 0,
+        position: 'fixed',
+        left: '-9999px',
+        top: 0,
+        'overflow-x': 'hidden',
+        'overflow-y': 'scroll'
+    });
 
-		$inner.css({
-			'min-height': '10px'
-		});
+    $inner.css({
+      'min-height': '10px'
+    });
 
-		$tester.append($inner);
-		$('html').append($tester);
+    $tester.append($inner);
+    $('html').append($tester);
 
-		var scroll_width = $inner.width();
-		$inner.remove();
-		$tester.remove();
+    var scroll_width = $inner.width();
+    $inner.remove();
+    $tester.remove();
 
-		return 100 - scroll_width;
-	}
+    return 100 - scroll_width;
+  }
 
-	window.scroll_width = getScrollWidth();
+  window.scroll_width = getScrollWidth();
 
-	function storePaddingRight($elem) {
-		var padding_right = parseInt($elem.css('padding-right'), 10);
-		$elem.data('padding-right', padding_right);
-		return padding_right;
-	}
+  function storePaddingRight($elem) {
+    var padding_right = parseInt($elem.css('padding-right'), 10);
+    $elem.data('padding-right', padding_right);
+    return padding_right;
+  }
 
-	function restorePaddingRight($elem) {
-		var padding_right = $elem.data('padding-right');
-		$elem.css('padding-right', padding_right);
-		$elem.data('padding-right', null);
-		return padding_right;
-	}
+  function restorePaddingRight($elem) {
+    var padding_right = $elem.data('padding-right');
+    $elem.css('padding-right', padding_right);
+    $elem.data('padding-right', null);
+    return padding_right;
+  }
 
-	$.fn.paddingFill = function() {
-		var $this = $(this);
+  $.fn.paddingFill = function() {
+    var $this = $(this);
 
-		if (window.scroll_width) {
-			$this.each(function() {
-				var $elem = $(this);
-				var data = $elem.data('padding-right');
-				if (data === null || data === undefined) {
-					$elem.css('padding-right', storePaddingRight($elem) + scroll_width );
-				}
-			});
-		}
-	};
+    if (window.scroll_width) {
+      $this.each(function() {
+        var $elem = $(this);
+        var data = $elem.data('padding-right');
+        if (data === null || data === undefined) {
+          $elem.css('padding-right', storePaddingRight($elem) + scroll_width );
+        }
+      });
+    }
+  };
 
-	$.fn.disableScroll = function() {
-		var $this = $(this);
-		var $html = $('html');
+  $.fn.disableScroll = function() {
+    var $this = $(this);
+    var $html = $('html');
 
-		if (!$html.data('scroll-blocked')) {
-			$html.css({
-				overflow: 'hidden',
-				height: '100%'
-			});
-			$html.data('scroll-blocked', true);
-		}
+    if (!$html.data('scroll-blocked')) {
+      $html.css({
+        overflow: 'hidden',
+        height: '100%'
+      });
+      $html.data('scroll-blocked', true);
+    }
 
-		$this.paddingFill();
-	};
+    $this.paddingFill();
+  };
 
-	$.fn.undoPaddingFill = function() {
-		var $this = $(this);
+  $.fn.undoPaddingFill = function() {
+    var $this = $(this);
 
-		if (window.scroll_width) {
-			$this.each(function() {
-				var $elem = $(this);
-				var data = $elem.data('padding-right');
-				if (data !== null) {
-					$elem.css('padding-right', restorePaddingRight($elem));
-				}
-			});
-		}
-	};
+    if (window.scroll_width) {
+      $this.each(function() {
+        var $elem = $(this);
+        var data = $elem.data('padding-right');
+        if (data !== null) {
+          $elem.css('padding-right', restorePaddingRight($elem));
+        }
+      });
+    }
+  };
 
-	$.fn.enableScroll = function() {
-		var $this = $(this);
-		$this.undoPaddingFill();
-		var $html = $('html');
+  $.fn.enableScroll = function() {
+    var $this = $(this);
+    $this.undoPaddingFill();
+    var $html = $('html');
 
-		if ($html.data('scroll-blocked')) {
-			$html.css({
-				overflow: 'auto',
-				height: 'auto'
-			});
-			$html.data('scroll-blocked', false);
-		}
-	};
+    if ($html.data('scroll-blocked')) {
+      $html.css({
+        overflow: 'auto',
+        height: 'auto'
+      });
+      $html.data('scroll-blocked', false);
+    }
+  };
 
-	// https://www.youtube.com/watch?v=gJ-WmYn_9GE
+  // https://www.youtube.com/watch?v=gJ-WmYn_9GE
     window._modally_video_re = {};
     window._modally_video_re.YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
     window._modally_video_re.VIMEO = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
-	//TODO: add support for brightcove and cloudfront
-	//TODO: automatic video modal detection
+    window._modally_video_re.VIDEO = /(.*\/[^\/]+\.mp4|ogg|ogv|ogm|webm|avi)\s?$/i;
+  //TODO: add support for brightcove and cloudfront
+  //TODO: automatic video modal detection
 
-	window._modally_index = {};
+  window._modally_index = {};
 
     var Modally = function(id, elem, params) {
         var self = this;
@@ -126,7 +127,7 @@
         var defaults = {
             'landing': 'body',
             'max-width': 'none',
-			'classes': '',
+      'classes': '',
             'vertical-align': 'middle',
             'close-parent': false,
             'close-other': false,
@@ -148,9 +149,9 @@
         function __init__() {
             for (var k in defaults) {
                 //load in defaults
-    			if (!self.params.hasOwnProperty(k)) {
-    				self.params[k] = defaults[k];
-    			}
+          if (!self.params.hasOwnProperty(k)) {
+            self.params[k] = defaults[k];
+          }
 
                 //check for inline properties - not deep
                 if (self.$element.length) {
@@ -168,7 +169,7 @@
                         self.params[k] = attr;
                     }
                 }
-    		}
+        }
 
             //setup
             self.$template.find('.modally').css({
@@ -182,28 +183,30 @@
             if (self.$element.length) {
                 self.$element.data('modally', self);
 
-				if (self.$element.hasClass('modally-init')) {
-					self.$element.removeClass('modally-init');
-				}
-				self.$element.show();
+                if (self.$element.hasClass('modally-init')) {
+                  self.$element.removeClass('modally-init');
+                }
+                self.$element.show();
             }
             self.$template.data('modally', self);
-			self.$template.addClass(self.params['classes']);
+            self.$template.addClass(self.params['classes']);
 
             if (self.params.video) {
                 self.$spacer = $('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAJCAYAAAFMLZykAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAAABFJREFUKBVjYBgFoyFA1RAAAAJTAAEABdnJAAAAAElFTkSuQmCC" />');
                 var ymod = '';
                 var vmod = '';
+                var vidmod = '';
                 if (self.params.autoplay) {
                     ymod = 'autoplay=1&amp;';
                     vmod = 'autoplay=1';
+                    vidmod = ' autoplay';
                 }
-                self.$embeds = $('<iframe class="youtube template" data-src="https://www.youtube.com/embed/{ID}?'+ymod+'autohide=1&amp;fs=1&amp;rel=0&amp;hd=1&amp;wmode=opaque&amp;enablejsapi=1" type="text/html" width="1920" height="1080" allow="autoplay" frameborder="0" vspace="0" hspace="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" scrolling="auto"></iframe><iframe class="vimeo template" title="vimeo-player" data-src="https://player.vimeo.com/video/{ID}?'+vmod+'" type="text/html" width="1920" height="1080" allow="autoplay; allowfullscreen" rameborder="0" allowfullscreen=""></iframe>');
+                self.$embeds = $('<iframe class="youtube embed-template template" data-src="https://www.youtube.com/embed/{ID}?'+ymod+'autohide=1&amp;fs=1&amp;rel=0&amp;hd=1&amp;wmode=opaque&amp;enablejsapi=1" type="text/html" width="1920" height="1080" allow="autoplay" frameborder="0" vspace="0" hspace="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" scrolling="auto"></iframe><iframe class="vimeo embed-template template" title="vimeo-player" data-src="https://player.vimeo.com/video/{ID}?'+vmod+'" type="text/html" width="1920" height="1080" allow="autoplay; allowfullscreen" rameborder="0" allowfullscreen=""></iframe><video class="video embed-template template" data-src="{ID}" controls playsinline'+vidmod+'></video>');
                 self.$template.find('.modally-content').append('<div class="iframe-landing"></div>');
                 self.$template.find('.iframe-landing').append(self.$spacer);
                 self.$spacer.css({'width': '100%', 'display': 'block'});
                 self.$template.append(self.$embeds);
-				self.$embeds.hide();
+        self.$embeds.hide();
                 self.$template.addClass('video-embed');
             } else {
                 if (self.$element.length) {
@@ -226,7 +229,7 @@
             var event_elem = self.$element.length ? self.$element : $(document);
             event_elem.trigger('modally:init', [self]);
             $(document).trigger('modally:init:'+self.id, [self]);
-			window._modally_index[id] = self;
+      window._modally_index[id] = self;
         }
         __init__();
     };
@@ -235,15 +238,15 @@
     Modally.prototype.open = function(e, callback) {
         var $parent_modally = null;
 
-		if (e && !e.hasOwnProperty('currentTarget')) {
-			e  = $(e);
-		}
+    if (e && !e.hasOwnProperty('currentTarget')) {
+      e  = $(e);
+    }
 
-		if (e && e.hasOwnProperty('currentTarget')) {
-			$parent_modally = $(e.currentTarget).closest('.modally-wrap');
-		} else {
-			$parent_modally = $(e).closest('.modally-wrap'); //XXX: ???
-		}
+    if (e && e.hasOwnProperty('currentTarget')) {
+      $parent_modally = $(e.currentTarget).closest('.modally-wrap');
+    } else {
+      $parent_modally = $(e).closest('.modally-wrap'); //XXX: ???
+    }
 
         var self = this;
         $('body').addClass('modally-open modally-'+this.id);
@@ -255,38 +258,39 @@
             if (self.params.video) {
                 var link = null;
 
-				if (e && e.hasOwnProperty('currentTarget')) {
-					link = $(e.currentTarget).data('video');
-				} else {
-					var url_pts = /video=([^&]+)/gi.exec(window.location.hash);
-					if (url_pts && url_pts.length && url_pts[1] !== '') {
-						link = url_pts[1];
-					}
-				}
+        if (e && e.hasOwnProperty('currentTarget')) {
+          link = $(e.currentTarget).data('video');
+        } else {
+          var url_pts = /video=([^&]+)/gi.exec(window.location.hash);
+          if (url_pts && url_pts.length && url_pts[1] !== '') {
+            link = url_pts[1];
+          }
+        }
 
                 var pts = [];
                 var link_type = null;
 
-    			for (var k in window._modally_video_re) {
-    				var reg = window._modally_video_re[k];
+          for (var k in window._modally_video_re) {
+            var reg = window._modally_video_re[k];
 
-    				var pts_tmp = reg.exec(link);
+            var pts_tmp = reg.exec(link);
 
-    				if (pts_tmp && pts_tmp.length && pts_tmp[1] !== '') {
-    				 	pts = pts_tmp;
-    					link_type = k;
-    					break;
-    				}
+            if (pts_tmp && pts_tmp.length && pts_tmp[1] !== '') {
+               pts = pts_tmp;
+              link_type = k;
+              break;
+            }
 
-					reg.lastIndex = 0;
-    			}
+          reg.lastIndex = 0;
+          }
 
                 if (pts && pts.length) {
                     var id = pts[1];
-                    var $temp = self.$template.find('iframe.template.'+link_type.toLowerCase()).clone();
+                    var $temp = self.$template.find('.embed-template.template.'+link_type.toLowerCase()).clone();
                     $temp.removeClass('template');
                     $temp.show();
                     var srctemp = $temp.data('src');
+                    console.log($temp);
                     var src = srctemp.replace('{ID}', id);
                     $temp.attr('src', src);
                     self.$template.find('.iframe-landing').append($temp);
@@ -416,29 +420,29 @@
         }
         window._modally_storage[id] = new Modally(id, $this, params);
 
-		return $this;
+    return $this;
     };
 
     window.modally = $.fn.modally;
 
     //close last modal on escape
     $(document).on('keyup', function(e) {
-		if (e.which === 27) {
-			var $last_modally = $('.modally-wrap.open.last');
-			if ($last_modally.length) {
-				 $last_modally.data('modally').close();
-			}
-		}
+    if (e.which === 27) {
+      var $last_modally = $('.modally-wrap.open.last');
+      if ($last_modally.length) {
+         $last_modally.data('modally').close();
+      }
+    }
     });
 
     function _modallyTrigger(e, elem, action) {
-		var href = null;
+    var href = null;
 
-		if (typeof elem === 'string') {
-			href = elem;
-		} else {
-			href = $(elem).attr('href');
-		}
+    if (typeof elem === 'string') {
+      href = elem;
+    } else {
+      href = $(elem).attr('href');
+    }
 
         if (href === undefined
             || href === null
@@ -446,14 +450,14 @@
             || href === '#') {
 
             if (action === 'close') {
-				if (e) {
-					var $parent = $(e.currentTarget).closest('.modally-wrap');
-	                if ($parent.length) {
-	                    var data = $parent.data('modally');
-	                    data.close();
-	                    return;
-	                }
-				}
+        if (e) {
+          var $parent = $(e.currentTarget).closest('.modally-wrap');
+                  if ($parent.length) {
+                      var data = $parent.data('modally');
+                      data.close();
+                      return;
+                  }
+        }
             }
 
             console.error('jquery.modally >> href attribute needs to contain the existing modal ID');
@@ -465,7 +469,7 @@
         }
 
         if (window.hasOwnProperty('_modally_storage')
-			&& window._modally_storage.hasOwnProperty(href)) {
+      && window._modally_storage.hasOwnProperty(href)) {
 
             window._modally_storage[href][action](e);
         } else {
@@ -487,31 +491,31 @@
     $(document).on('click', 'a[target="_modal:open"]', _modallyTriggerOpen);
     $(document).on('click', 'a[target="_modal:close"]', _modallyTriggerClose);
 
-	function modallyHashCheck() {
-		if (window.location.hash !== ''
-			&& window.location.hash !== '#') {
-			var href = window.location.hash;
+  function modallyHashCheck() {
+    if (window.location.hash !== ''
+      && window.location.hash !== '#') {
+      var href = window.location.hash;
 
-			var url_pts = /^#([a-z\_\-]+[a-z0-9\_\-]*)/gi.exec(window.location.hash);
-			if (url_pts && url_pts.length && url_pts[1].length) {
-				href = url_pts[1];
-			}
+      var url_pts = /^#([a-z\_\-]+[a-z0-9\_\-]*)/gi.exec(window.location.hash);
+      if (url_pts && url_pts.length && url_pts[1].length) {
+        href = url_pts[1];
+      }
 
-			if (window._modally_index.hasOwnProperty(href)) {
-				_modallyTrigger(null, href, 'open');
-			}
-		}
-	}
+      if (window._modally_index.hasOwnProperty(href)) {
+        _modallyTrigger(null, href, 'open');
+      }
+    }
+  }
 
-	$(document).ready(function() {
-		$('.modally-init').each(function(){
-			$(this).modally();
-		});
+  $(document).ready(function() {
+    $('.modally-init').each(function(){
+      $(this).modally();
+    });
 
-		modallyHashCheck();
-	});
+    modallyHashCheck();
+  });
 
-	$(window).on('hashchange', function() {
-		modallyHashCheck();
-	});
+  $(window).on('hashchange', function() {
+    modallyHashCheck();
+  });
 })(jQuery);

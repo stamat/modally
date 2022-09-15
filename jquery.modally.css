@@ -99,7 +99,8 @@
     position: relative
 }
 
-.modally .iframe-landing iframe {
+.modally .iframe-landing iframe,
+.modally .iframe-landing video {
     display: block;
     width: 100% !important;
     height: 100% !important;
