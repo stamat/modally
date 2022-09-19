@@ -380,7 +380,7 @@
         }
 
         if (this.params.video) {
-            this.$template.find('.iframe-landing iframe').remove();
+            this.$template.find('.iframe-landing iframe, .iframe-landing video').remove();
         }
 
         if (this.initial_z_index !== this.$template.css('z-index')) {
