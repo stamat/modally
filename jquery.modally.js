@@ -193,7 +193,7 @@
             self.$template.addClass(self.params['classes']);
 
             if (self.params.video) {
-                self.$spacer = $('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAJCAYAAAFMLZykAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAAABFJREFUKBVjYBgFoyFA1RAAAAJTAAEABdnJAAAAAElFTkSuQmCC" />');
+                self.$spacer = $('<svg aria-hidden="true" width="1920" height="1080"></svg>');
                 var ymod = '';
                 var vmod = '';
                 var vidmod = '';
@@ -202,11 +202,12 @@
                     vmod = 'autoplay=1';
                     vidmod = ' autoplay';
                 }
+                self.$embeds = $('<iframe class="youtube embed-template template" data-src="https://www.youtube.com/embed/{ID}?'+ymod+'autohide=1&amp;fs=1&amp;rel=0&amp;hd=1&amp;wmode=opaque&amp;enablejsapi=1" type="text/html" width="1920" height="1080" allow="autoplay" frameborder="0" vspace="0" hspace="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" scrolling="auto"></iframe><iframe class="vimeo embed-template template" title="vimeo-player" data-src="https://player.vimeo.com/video/{ID}?'+vmod+'" type="text/html" width="1920" height="1080" allow="autoplay; allowfullscreen" rameborder="0" allowfullscreen=""></iframe><video height="1920" width="1080" class="video embed-template template" data-src="{ID}" controls playsinline'+vidmod+'></video>');
                 self.$template.find('.modally-content').append('<div class="iframe-landing"></div>');
                 self.$template.find('.iframe-landing').append(self.$spacer);
                 self.$spacer.css({'width': '100%', 'display': 'block'});
                 self.$template.append(self.$embeds);
-        self.$embeds.hide();
+                self.$embeds.hide();
                 self.$template.addClass('video-embed');
             } else if (self.params.image) {
               self.$template.find('.modally-content').append('<div class="image-landing"><img style="width: 100%; height: auto;" decoding="async" loading="lazy" alt="" /></div>');
