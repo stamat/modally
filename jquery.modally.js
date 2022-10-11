@@ -121,8 +121,6 @@
             this.params = {};
         }
 
-        this.$template = $('<div class="modally-wrap"><div class="modally-table"><div class="modally-cell"><div class="modally-underlay modally-close"></div><div class="modally" role="dialog" aria-modal="true"><button tabindex="1" class="modally-close modally-close-button">&times;</button><div class="modally-content"></div></div></div></div></div>');
-
 
         var defaults = {
             'landing': 'body',
@@ -131,8 +129,10 @@
             'vertical-align': 'middle',
             'close-parent': false,
             'close-other': false,
+            'image': false,
             'video': false,
             'autoplay': true,
+            'template': '<div class="modally-wrap"><div class="modally-table"><div class="modally-cell"><div class="modally-underlay modally-close"></div><div class="modally" role="dialog" aria-modal="true"><button tabindex="1" class="modally-close modally-close-button">&times;</button><div class="modally-content"></div></div></div></div></div>',
             'in-duration': 'normal',
             'in-easing': 'swing',
             'out-duration': 'normal',
@@ -170,6 +170,7 @@
                     }
                 }
         }
+            self.$template = $(self.params.template);
 
             //setup
             self.$template.find('.modally').css({
@@ -201,13 +202,15 @@
                     vmod = 'autoplay=1';
                     vidmod = ' autoplay';
                 }
-                self.$embeds = $('<iframe class="youtube embed-template template" data-src="https://www.youtube.com/embed/{ID}?'+ymod+'autohide=1&amp;fs=1&amp;rel=0&amp;hd=1&amp;wmode=opaque&amp;enablejsapi=1" type="text/html" width="1920" height="1080" allow="autoplay" frameborder="0" vspace="0" hspace="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" scrolling="auto"></iframe><iframe class="vimeo embed-template template" title="vimeo-player" data-src="https://player.vimeo.com/video/{ID}?'+vmod+'" type="text/html" width="1920" height="1080" allow="autoplay; allowfullscreen" rameborder="0" allowfullscreen=""></iframe><video class="video embed-template template" data-src="{ID}" controls playsinline'+vidmod+'></video>');
                 self.$template.find('.modally-content').append('<div class="iframe-landing"></div>');
                 self.$template.find('.iframe-landing').append(self.$spacer);
                 self.$spacer.css({'width': '100%', 'display': 'block'});
                 self.$template.append(self.$embeds);
         self.$embeds.hide();
                 self.$template.addClass('video-embed');
+            } else if (self.params.image) {
+              self.$template.find('.modally-content').append('<div class="image-landing"><img style="width: 100%; height: auto;" decoding="async" loading="lazy" alt="" /></div>');
+              self.$template.addClass('image-embed');
             } else {
                 if (self.$element.length) {
                     var ghost = self.$element.detach();
@@ -296,6 +299,11 @@
                 }
             }
 
+            if (self.params.image) {
+              link = $(e.currentTarget).data('image');
+              self.$template.find('.image-landing img').attr('src', link);
+            }
+
             $('html, .modally-wrap').disableScroll();
 
             if (window.hasOwnProperty('iNoBounce')) {
@@ -382,6 +390,12 @@
         if (this.params.video) {
             this.$template.find('.iframe-landing iframe, .iframe-landing video').remove();
         }
+
+        /*
+        if (this.params.image) {
+            this.$template.find('.image-landing img').removeAttr('src');
+        }
+        */
 
         if (this.initial_z_index !== this.$template.css('z-index')) {
             this.$template.css('z-index', this.initial_z_index);
@@ -486,9 +500,9 @@
         _modallyTrigger(e, this, 'close');
     }
 
-    $(document).on('click', 'a[target="_modal"]', _modallyTriggerOpen);
-    $(document).on('click', 'a[target="_modal:open"]', _modallyTriggerOpen);
-    $(document).on('click', 'a[target="_modal:close"]', _modallyTriggerClose);
+    $(document).on('click', '[target="_modal"]:not([disabled])', _modallyTriggerOpen);
+    $(document).on('click', '[target="_modal:open"]:not([disabled])', _modallyTriggerOpen);
+    $(document).on('click', '[target="_modal:close"]:not([disabled])', _modallyTriggerClose);
 
   function modallyHashCheck() {
     if (window.location.hash !== ''
