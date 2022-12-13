@@ -205,7 +205,7 @@
                 self.$embeds = $('<iframe class="youtube embed-template template" data-src="https://www.youtube.com/embed/{ID}?'+ymod+'autohide=1&amp;fs=1&amp;rel=0&amp;hd=1&amp;wmode=opaque&amp;enablejsapi=1" type="text/html" width="1920" height="1080" allow="autoplay" frameborder="0" vspace="0" hspace="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" scrolling="auto"></iframe><iframe class="vimeo embed-template template" title="vimeo-player" data-src="https://player.vimeo.com/video/{ID}?'+vmod+'" type="text/html" width="1920" height="1080" allow="autoplay; allowfullscreen" rameborder="0" allowfullscreen=""></iframe><video height="1920" width="1080" class="video embed-template template" data-src="{ID}" controls playsinline'+vidmod+'></video>');
                 self.$template.find('.modally-content').append('<div class="iframe-landing"></div>');
                 self.$template.find('.iframe-landing').append(self.$spacer);
-                self.$spacer.css({'width': '100%', 'display': 'block'});
+                self.$spacer.css({'width': '100%', 'display': 'block', 'height': 'auto'});
                 self.$template.append(self.$embeds);
                 self.$embeds.hide();
                 self.$template.addClass('video-embed');
