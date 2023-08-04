@@ -1,28 +1,29 @@
 {
   "name": "modally",
-  "version": "1.0.5",
-  "description": "Simple jQuery plugin for nested modals.",
-  "main": "jquery.modally.js",
+  "version": "1.1.0",
+  "description": "Simple plugin for nested modals.",
+  "main": "modally.js",
+  "style": "modally.scss",
   "repository": {
     "type": "git",
-    "url": "https://github.com/stamat/jquery.modally.git"
+    "url": "https://github.com/stamat/modally.git"
   },
   "keywords": [
     "modal",
     "popup",
     "modal-window",
-    "jquery",
-    "nested",
-    "jquery-plugin"
+    "nested"
   ],
-  "author": "Nikola Stamatovic <nikola.stamatovic@me.com>",
+  "author": "Nikola Stamatovic <@stamat>",
   "contributors": [],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/stamat/jquery.modally/issues"
+    "url": "https://github.com/stamat/modally/issues"
+  },
+  "devDependencies": {
+    "poops": "^1.0.10"
   },
   "dependencies": {
-    "inobounce": ">= 0.2.0",
-    "jquery": ">=1.11.3"
+    "book-of-spells": "^1.0.5"
   }
 }

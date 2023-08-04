@@ -1,0 +1,24 @@
+{
+  "scripts": [{
+  "in": "build/iife.js",
+  "out": "dist/modally.js",
+  "options": {
+    "sourcemap": true,
+    "minify": true,
+    "justMinified": false,
+    "format": "iife",
+    "target": "es2019",
+    "mangle": true,
+    "globalName": "focusOutline"
+  }
+  }],
+  "styles": [{
+    "in": "modally.scss",
+    "out": "dist/modally.css",
+    "options": {
+      "minify": true,
+      "sourcemap": true
+    }
+  }],
+  "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */"
+}
