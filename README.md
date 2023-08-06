@@ -1,8 +1,8 @@
 ![jquery.modally](https://imgur.com/4OAlRoz.png)
 
-If there are many different variations of the same functionality, the rule says it's easy to make. And the same goes for jQuery modal plugins - they are super easy to make.
+If there are many different variations of the same functionality, the rule says it's easy to make. And the same goes for web modal dialogues - they are super easy to make.
 
-I created this plugin as a repo cause I wrote the same code for every project that required modals, over and over again throughout the years, just because it's trivial and I needed 5 minutes to make it.
+I created this web modal dialog library as a repo cause I wrote the same code for every project that required modals, over and over again throughout the years, just because it's trivial and I needed "5 minutes" to make it.
 
 But regardless, **life is short - make reusable code!**
 
@@ -11,11 +11,11 @@ But regardless, **life is short - make reusable code!**
 ![Imgur](https://imgur.com/Zzg3FDx.png)
 
 ## Features
-* **Simplest one yet** - almost everything is automatic
+* **Simplest one yet** - almost everything is automatic (or at least it should be 😅)
 * **HTML auto-wrapped**
 * **State classes** = blurred background
 * **Vertically centered**
-* **Scroll blocking** - even on iOS
+* **Scroll blocking** 
 * **Nested** - automatic detection, no need for additional coding
 * **Video embeddable** - automatic Vimeo and Youtube embeds with autoplay
 * **ESC closable**
@@ -25,8 +25,10 @@ But regardless, **life is short - make reusable code!**
 
 ### Quick Start
 ```javascript
+	const modally = new Modally();
+
 	//turns your content into a modal, wraps it nicely - be sure to set it to display:none in CSS
-	$('#your-content').modally();
+	modally.add('your-content');
 ```
 ```html
 	<div id="your-content" style="display:none;"><h1>Hello world!</h1></div>
@@ -36,8 +38,10 @@ But regardless, **life is short - make reusable code!**
 ### Youtube and Vimeo modals
 
 ```javascript
+	const modally = new Modally();
+
 	//creates a video modal which looks for data-video and opens a Youtube or Vimeo embed within your modal
-	modally('your-video-modal', {video: true});
+	modally.add('your-video-modal', {video: true});
 ```
 ```html
 	<a href="#your-video-modal" target="_modal" data-video="https://www.youtube.com/watch?v=u9QJo5fBADE"></a>
@@ -47,8 +51,10 @@ But regardless, **life is short - make reusable code!**
 ### Advanced Usage
 
 ```javascript
-		modally('advanced-example');
-		$(document).on('modally:opening:advanced-example', function(ev, e, modally) {
+		const modally = new Modally();
+		modally.add('advanced-example');
+
+		document.addEventListener('modally:opening:advanced-example', function(ev, e, modally) {
 			modally.$template.find('.modally-content').empty();
 
 			/* GENERATE YOUR CONTENT */
@@ -59,9 +65,6 @@ But regardless, **life is short - make reusable code!**
 ```html
 	<a href="#advanced-example" target="_modal"></a>
 ```
-
-### Third party integration
-Modally automatically integrates with [iNoBounce](https://github.com/lazd/iNoBounce), if it is available, to prevent scrolling on Safari iOS
 
 
 
@@ -75,10 +78,6 @@ Property | Default | Accepts | Description
 **close-other** | false | boolean | Wether to close all other opened modals upon opening this modal
 **video** | false | boolean | For creating a video modal
 **autoplay** | true | boolean | Whether video modal should autoplay
-**in-duration** | 'normal' | 'slow', 'normal', 'fast' or number of milliseconds | Speed of fade in, uses jQuery.fadeIn
-**in-easing** | 'swing' | string | Easing of fade in, uses jQuery.fadeIn
-**out-duration** | 'normal' | 'slow', 'normal', 'fast' or number of milliseconds | Speed of fade out, uses jQuery.fadeOut
-**out-easing** | 'swing' | string | Easing of fade in, uses jQuery.fadeOut
 
 ## Events
 

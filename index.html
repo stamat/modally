@@ -273,10 +273,11 @@
         <script type="text/javascript">
             const modally = new Modally({
                 disableScroll: true
-            });
+            })
+            
             modally.add('ipsum', {
-              'maxWidth': 800,
-               'selector': '#ipsum'
+                'max-width': 800,
+                'selector': '#ipsum'
             })
 
             modally.add('lorem')
@@ -285,7 +286,7 @@
 
             modally.add('video-modal', {
                 video: true,
-                'maxWidth': 800
+                'max-width': 800
             })
 
             modally.initHashCheck()

@@ -284,7 +284,6 @@
       this.videoRegEx.YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
       this.videoRegEx.VIMEO = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
       this.videoRegEx.VIDEO = /(.*\/[^\/]+\.mp4|ogg|ogv|ogm|webm|avi)\s?$/i;
-      this.scrollWidth = getScrollbarWidth();
       this.options = {
         "landing": "body",
         "max-width": "none",
@@ -435,6 +434,7 @@
       this.options = {
         disableScroll: true
       };
+      this.scrollbarWidth = getScrollbarWidth();
       if (options)
         shallowMerge(this.options, options);
       document.addEventListener("click", (e) => {

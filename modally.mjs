@@ -14,8 +14,6 @@ export class Modal {
     //TODO: add support for brightcove and cloudfront
     //TODO: automatic video modal detection
 
-    this.scrollWidth = getScrollbarWidth();
-
     this.options = {
       'landing': 'body',
       'max-width': 'none',
@@ -196,6 +194,8 @@ export class Modally {
     this.options = {
       disableScroll: true,
     }
+
+    this.scrollbarWidth = getScrollbarWidth()
 
     if (options) shallowMerge(this.options, options)
 
