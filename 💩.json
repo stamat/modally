@@ -20,5 +20,15 @@
       "sourcemap": true
     }
   }],
-  "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */"
+  "banner": "/* {{ name }} v{{ version }} | {{ homepage }} | {{ license }} License */",
+  "serve" : {
+    "port": 4040,
+    "base": "/"
+    },
+  "livereload": true,
+  "watch": [
+    "modally.mjs",
+    "modally.scss",
+    "index.html"
+  ]
 }

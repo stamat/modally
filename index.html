@@ -219,11 +219,11 @@
             }
         </style>
 
-        <link rel="stylesheet" href="jquery.modally.css">
+        <link rel="stylesheet" href="dist/modally.css">
 
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/inobounce/0.2.0/inobounce.min.js"></script>
-        <script type="text/javascript" src="jquery.modally.js"></script>
+        <script type="text/javascript" src="dist/modally.js"></script>
     </head>
     <body>
         <div class="container">
@@ -271,14 +271,29 @@
             </main>
         </div>
         <script type="text/javascript">
-            jQuery(document).ready(function() {
-                $('#ipsum').modally('ipsum', {'max-width': 800});
-                //$('#lorem').modally();
-                $('#dolor').modally();
-                modally('video-modal', {video: true, 'max-width': 800});
-            });
+            const modally = new Modally();
+            modally.add('ipsum', {
+              'max-width': 800,
+               'selector': '#ipsum'
+            })
+
+            modally.add('lorem')
+
+            modally.add('dolor')
+
+            modally.add('video-modal', {
+                video: true,
+                'max-width': 800
+            })
+
+            modally.initHashCheck()
         </script>
         <!-- Place this tag in your head or just before your close body tag. -->
         <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+        <script>document.write('<script src="http://'
+            + (location.host || 'localhost').split(':')[0]
+            + ':35729/livereload.js?snipver=1"></'
+            + 'script>')</script>
     </body>
 </html>

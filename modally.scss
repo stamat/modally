@@ -13,8 +13,10 @@
     z-index: 1000;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
+    opacity: 0;
     display: none;
     box-sizing: border-box;
+    transition: opacity 500ms ease-in-out;
 }
 
 .modally-wrap .modally-underlay {
