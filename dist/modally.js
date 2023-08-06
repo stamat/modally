@@ -328,10 +328,12 @@
     element.style.opacity = styles.opacity;
     setTimeout(() => {
       element.style.opacity = 0;
+      element.style.pointerEvents = "none";
     }, 10);
     setTransitionTimer(element, "opacity", duration, (element2) => {
       element2.style.display = "none";
       element2.style.opacity = "";
+      element2.style.pointerEvents = "";
       if (isFunction2(callback))
         callback(element2);
     });
@@ -480,21 +482,19 @@
       img.style.display = "block";
       img.removeAttribute("hidden");
     }
-    open(dataset, callback) {
+    open(dataset) {
       if (this.options.video && dataset && dataset.hasOwnProperty("video")) {
         this.mountVideo(dataset.video);
       }
       if (this.options.image && dataset && dataset.hasOwnProperty("image")) {
         this.mountImage(dataset.image);
       }
-      fadeIn(this.template, callback);
+      fadeIn(this.template);
     }
-    close(dataset, callback) {
+    close(dataset) {
       fadeOut(this.template, () => {
         if (this.options.video)
           this.unmountVideo();
-        if (callback)
-          callback();
         css(this.template, {
           "zIndex": this.zIndex
         });
@@ -507,18 +507,25 @@
       this.opened = [];
       document.addEventListener("click", (e) => {
         const target = e.target;
-        if (!target.matches('[target="_modal"]:not([disabled]), [target="_modal:open"]:not([disabled]), [target="_modal:close"]:not([disabled])'))
+        if (!target.matches('[target^="_modal"]:not([disabled])'))
           return;
+        const targetQuery = target.getAttribute("target").replace("_modal:", "");
+        const targetQueryParts = targetQuery.split(":");
         const href = target.getAttribute("href");
+        let id, modal;
         if (href && href.length && href !== "#") {
-          const modal = this.get(href.replace("#", ""));
-          if (modal) {
-            e.preventDefault();
-            if (target.matches('[target="_modal:close"]'))
-              return this.close(modal, target.dataset);
-            this.open(modal, target.dataset);
-          }
+          e.preventDefault();
+          id = href.replace("#", "");
+          modal = this.get(id);
         }
+        if (targetQueryParts.length > 1) {
+          id = targetQueryParts[1];
+          modal = this.get(id);
+        }
+        if (targetQueryParts[0] === "close")
+          return this.close(modal, target.dataset);
+        if (modal)
+          this.open(modal, target.dataset);
       });
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
@@ -545,24 +552,24 @@
     get(id) {
       return this.index[id];
     }
-    open(id, dataset, callback) {
+    open(id, dataset) {
       const modal = id instanceof Modal ? id : this.get(id);
       if (!modal)
         return;
-      modal.open(dataset, callback);
+      modal.open(dataset);
       this.opened.push(modal);
       css(modal.template, {
         "zIndex": modal.zIndex + this.opened.length
       });
     }
-    close(id, dataset, callback) {
+    close(id, dataset) {
       if (!id && this.opened.length) {
         id = this.opened[this.opened.length - 1];
       }
       const modal = id instanceof Modal ? id : this.get(id);
       if (!modal)
         return;
-      modal.close(dataset, callback);
+      modal.close(dataset);
       this.opened.pop();
     }
     // Only after registering all modals
