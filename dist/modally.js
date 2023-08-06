@@ -76,6 +76,9 @@
   function isString(o) {
     return typeof o === "string";
   }
+  function isFunction(o) {
+    return typeof o === "function";
+  }
   function transformDashToCamelCase(str) {
     return str.replace(/-([a-z])/g, function(g) {
       return g[1].toUpperCase();
@@ -92,6 +95,34 @@
       element.style[property] = styles[property];
     }
   }
+  function cssTimeToMilliseconds(duration) {
+    const regExp = new RegExp("([0-9.]+)([a-z]+)", "i");
+    const matches = regExp.exec(duration);
+    if (!matches)
+      return 0;
+    const unit = matches[2];
+    switch (unit) {
+      case "ms":
+        return parseFloat(matches[1]);
+      case "s":
+        return parseFloat(matches[1]) * 1e3;
+      default:
+        return 0;
+    }
+  }
+  function getTransitionDurations(element) {
+    if (!element) {
+    }
+    const styles = getComputedStyle(element);
+    const transitionProperties = styles.getPropertyValue("transition-property").split(",");
+    const transitionDurations = styles.getPropertyValue("transition-duration").split(",");
+    const map = {};
+    for (let i = 0; i < transitionProperties.length; i++) {
+      const property = transitionProperties[i].trim();
+      map[property] = transitionDurations.hasOwnProperty(i) ? cssTimeToMilliseconds(transitionDurations[i].trim()) : null;
+    }
+    return map;
+  }
   function detachElement(element) {
     if (element && element.parentNode) {
       element.parentNode.removeChild(element);
@@ -102,6 +133,19 @@
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     return doc.body.firstChild;
+  }
+
+  // node_modules/book-of-spells/src/parsers.mjs
+  function parseUrlParameters(paramString, decode = true) {
+    const res = {};
+    const paramParts = paramString.split("&");
+    paramParts.forEach((part) => {
+      const m = part.match(/([^\s=&]+)=?([^&\s]+)?/);
+      const key = m[1];
+      const value = m[2];
+      res[key] = value !== void 0 && decode ? stringToType(decodeURIComponent(value)) : value;
+    });
+    return res;
   }
 
   // node_modules/book-of-spells/src/browser.mjs
@@ -121,135 +165,15 @@
     document.body.removeChild(scrollDiv);
     return scrollbarWidth;
   }
-
-  // ../book-of-spells/src/helpers.mjs
-  function isEmptyObject2(o) {
-    for (const i in o) {
-      return false;
-    }
-    return true;
-  }
-  function isEmptyArray2(o) {
-    return o.length === 0;
-  }
-  function isEmpty2(o) {
-    if (isObject2(o)) {
-      return isEmptyObject2(o);
-    } else if (isArray2(o)) {
-      return isEmptyArray2(o);
-    } else if (isString2(o)) {
-      return o === "";
-    }
-    return false;
-  }
-  function stringToBoolean2(str) {
-    if (/^\s*(true|false)\s*$/i.test(str))
-      return str === "true";
-  }
-  function stringToNumber2(str) {
-    if (/^\s*\d+\s*$/.test(str))
-      return parseInt(str);
-    if (/^\s*[\d.]+\s*$/.test(str))
-      return parseFloat(str);
-  }
-  function stringToArray2(str) {
-    if (!/^\s*\[.*\]\s*$/.test(str))
-      return;
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-    }
-  }
-  function stringToObject2(str) {
-    if (!/^\s*\{.*\}\s*$/.test(str))
-      return;
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-    }
-  }
-  function stringToRegex2(str) {
-    if (!/^\s*\/.*\/g?i?\s*$/.test(str))
-      return;
-    try {
-      return new RegExp(str);
-    } catch (e) {
-    }
-  }
-  function stringToType2(str) {
-    if (/^\s*null\s*$/.test(str))
-      return null;
-    const bool = stringToBoolean2(str);
-    if (bool !== void 0)
-      return bool;
-    return stringToNumber2(str) || stringToArray2(str) || stringToObject2(str) || stringToRegex2(str) || str;
-  }
-  function isObject2(o) {
-    return typeof o === "object" && !Array.isArray(o) && o !== null;
-  }
-  function isArray2(o) {
-    return Array.isArray(o);
-  }
-  function isString2(o) {
-    return typeof o === "string";
-  }
-  function isFunction2(o) {
-    return typeof o === "function";
-  }
-
-  // ../book-of-spells/src/dom.mjs
-  function cssTimeToMilliseconds(duration) {
-    const regExp = new RegExp("([0-9.]+)([a-z]+)", "i");
-    const matches = regExp.exec(duration);
-    if (!matches)
-      return 0;
-    const unit = matches[2];
-    switch (unit) {
-      case "ms":
-        return parseFloat(matches[1]);
-      case "s":
-        return parseFloat(matches[1]) * 1e3;
-      default:
-        return 0;
-    }
-  }
-  function getTransitionDurations2(element) {
-    if (!element) {
-    }
-    const styles = getComputedStyle(element);
-    const transitionProperties = styles.getPropertyValue("transition-property").split(",");
-    const transitionDurations = styles.getPropertyValue("transition-duration").split(",");
-    const map = {};
-    for (let i = 0; i < transitionProperties.length; i++) {
-      const property = transitionProperties[i].trim();
-      map[property] = transitionDurations.hasOwnProperty(i) ? cssTimeToMilliseconds(transitionDurations[i].trim()) : null;
-    }
-    return map;
-  }
-
-  // ../book-of-spells/src/parsers.mjs
-  function parseUrlParameters(paramString, decode = true) {
-    const res = {};
-    const paramParts = paramString.split("&");
-    paramParts.forEach((part) => {
-      const m = part.match(/([^\s=&]+)=?([^&\s]+)?/);
-      const key = m[1];
-      const value = m[2];
-      res[key] = value !== void 0 && decode ? stringToType2(decodeURIComponent(value)) : value;
-    });
-    return res;
-  }
-
-  // ../book-of-spells/src/browser.mjs
   function getHashProperties(entryHash) {
     const hash = entryHash ? entryHash : window.location.hash.replace("#", "");
-    if (isEmpty2(hash))
+    if (isEmpty(hash))
       return {};
     return parseUrlParameters(hash);
   }
   function onHashChange(callback) {
     const hash = window.location.hash.replace("#", "");
-    if (!isEmpty2(hash))
+    if (!isEmpty(hash))
       callback(hash);
   }
   function hashChange(callback) {
@@ -259,7 +183,7 @@
     });
   }
 
-  // ../book-of-spells/src/animations.mjs
+  // node_modules/book-of-spells/src/animations.mjs
   function clearTransitionTimer(element, property = "all") {
     if (!element)
       return;
@@ -275,7 +199,7 @@
     const dataPropName = `${property}TransitionTimer`;
     const timer = setTimeout(() => {
       clearTransitionTimer(element, property);
-      if (isFunction2(callback))
+      if (isFunction(callback))
         callback(element);
     }, timeout);
     element.dataset[dataPropName] = timer.toString();
@@ -287,7 +211,7 @@
     const dataPropName = `${property}TransitionDuration`;
     if (element.dataset[dataPropName])
       return parseInt(element.dataset[dataPropName]);
-    const transitionDurations = getTransitionDurations2(element);
+    const transitionDurations = getTransitionDurations(element);
     if (!transitionDurations.hasOwnProperty(property))
       return;
     element.dataset[dataPropName] = transitionDurations[property].toString();
@@ -315,7 +239,7 @@
       element.style.removeProperty("pointer-events");
     }, 10);
     setTransitionTimer(element, "opacity", duration, (element2) => {
-      if (isFunction2(callback))
+      if (isFunction(callback))
         callback(element2);
     });
   }
@@ -334,7 +258,7 @@
       element2.style.display = "none";
       element2.style.opacity = "";
       element2.style.pointerEvents = "";
-      if (isFunction2(callback))
+      if (isFunction(callback))
         callback(element2);
     });
   }

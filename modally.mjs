@@ -1,5 +1,4 @@
-import { getScrollbarWidth, disableScroll, enableScroll, shallowMerge, parseDOM, stringToType, css, isString, detachElement, isEmpty } from "book-of-spells"
-import { fadeIn, fadeOut, hashChange, getHashProperties } from "../book-of-spells"
+import { getScrollbarWidth, disableScroll, enableScroll, shallowMerge, parseDOM, stringToType, css, isString, detachElement, isEmpty, fadeIn, fadeOut, hashChange, getHashProperties } from "book-of-spells"
 
 export class Modal {
   constructor(id, contentElement, options = {}, modallyInstance) {
