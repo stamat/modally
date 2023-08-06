@@ -165,6 +165,17 @@
     document.body.removeChild(scrollDiv);
     return scrollbarWidth;
   }
+  function disableScroll(shift = 0) {
+    const body = document.body;
+    body.style.overflow = "hidden";
+    body.style.paddingRight = `${shift}px`;
+  }
+  function enableScroll(shift = 0) {
+    const body = document.body;
+    body.style.overflow = "";
+    if (shift)
+      body.style.paddingRight = "";
+  }
   function getHashProperties(entryHash) {
     const hash = entryHash ? entryHash : window.location.hash.replace("#", "");
     if (isEmpty(hash))
@@ -284,15 +295,7 @@
         "image": false,
         "video": false,
         "autoplay": true,
-        "template": '<div class="modally-wrap"><div class="modally-table"><div class="modally-cell"><div class="modally-underlay modally-close"></div><div class="modally" role="dialog" aria-modal="true"><button tabindex="1" class="modally-close modally-close-button">&times;</button><div class="modally-content"></div></div></div></div></div>',
-        "in-duration": "normal",
-        "in-easing": "swing",
-        "out-duration": "normal",
-        "out-easing": "swing",
-        "in-css": null,
-        //TODO: css animation
-        "out-css": null
-        //TODO: css animation
+        "template": '<div class="modally-wrap"><div class="modally-table"><div class="modally-cell"><div class="modally-underlay modally-close"></div><div class="modally" role="dialog" aria-modal="true"><button tabindex="1" class="modally-close modally-close-button">&times;</button><div class="modally-content"></div></div></div></div></div>'
       };
       const landing = this.options.hasOwnProperty("landing") && this.options.landing instanceof HTMLElement ? this.options.landing : document.querySelector(this.options.landing);
       if (!landing)
@@ -426,9 +429,14 @@
     }
   };
   var Modally = class {
-    constructor() {
+    constructor(options) {
       this.index = {};
       this.opened = [];
+      this.options = {
+        disableScroll: true
+      };
+      if (options)
+        shallowMerge(this.options, options);
       document.addEventListener("click", (e) => {
         const target = e.target;
         if (!target.matches('[target^="_modal"]:not([disabled])'))
@@ -481,6 +489,8 @@
       if (!modal)
         return;
       modal.open(dataset);
+      if (!this.opened.length && this.options.disableScroll)
+        disableScroll();
       this.opened.push(modal);
       css(modal.template, {
         "zIndex": modal.zIndex + this.opened.length
@@ -495,6 +505,8 @@
         return;
       modal.close(dataset);
       this.opened.pop();
+      if (!this.opened.length && this.options.disableScroll)
+        enableScroll();
     }
     // Only after registering all modals
     initHashCheck() {

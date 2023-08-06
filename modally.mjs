@@ -27,12 +27,6 @@ export class Modal {
       'video': false,
       'autoplay': true,
       'template': '<div class="modally-wrap"><div class="modally-table"><div class="modally-cell"><div class="modally-underlay modally-close"></div><div class="modally" role="dialog" aria-modal="true"><button tabindex="1" class="modally-close modally-close-button">&times;</button><div class="modally-content"></div></div></div></div></div>',
-      'in-duration': 'normal',
-      'in-easing': 'swing',
-      'out-duration': 'normal',
-      'out-easing': 'swing',
-      'in-css': null, //TODO: css animation
-      'out-css': null //TODO: css animation
     }
 
     const landing = this.options.hasOwnProperty('landing') && this.options.landing instanceof HTMLElement ? this.options.landing : document.querySelector(this.options.landing)
@@ -196,9 +190,14 @@ export class Modal {
 }
 
 export class Modally {
-  constructor() {
+  constructor(options) {
     this.index = {}
     this.opened = []
+    this.options = {
+      disableScroll: true,
+    }
+
+    if (options) shallowMerge(this.options, options)
 
     document.addEventListener('click', (e) => {
       const target = e.target
@@ -258,6 +257,7 @@ export class Modally {
     const modal = id instanceof Modal ? id : this.get(id)
     if (!modal) return
     modal.open(dataset)
+    if (!this.opened.length && this.options.disableScroll) disableScroll()
     this.opened.push(modal)
     css(modal.template, {
       'zIndex': modal.zIndex + this.opened.length
@@ -273,6 +273,7 @@ export class Modally {
     if (!modal) return
     modal.close(dataset)
     this.opened.pop()
+    if (!this.opened.length && this.options.disableScroll) enableScroll()
   }
 
   // Only after registering all modals

@@ -271,9 +271,11 @@
             </main>
         </div>
         <script type="text/javascript">
-            const modally = new Modally();
+            const modally = new Modally({
+                disableScroll: true
+            });
             modally.add('ipsum', {
-              'max-width': 800,
+              'maxWidth': 800,
                'selector': '#ipsum'
             })
 
@@ -283,7 +285,7 @@
 
             modally.add('video-modal', {
                 video: true,
-                'max-width': 800
+                'maxWidth': 800
             })
 
             modally.initHashCheck()
