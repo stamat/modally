@@ -1,4 +1,23 @@
-import { getScrollbarWidth, disableScroll, enableScroll, shallowMerge, parseDOM, stringToType, css, isString, detachElement, isEmpty, fadeIn, fadeOut, hashChange, getHashProperties } from "book-of-spells"
+import { 
+  getScrollbarWidth, 
+  disableScroll, 
+  enableScroll, 
+  shallowMerge, 
+  parseDOM, 
+  stringToType, 
+  css, 
+  isString, 
+  detachElement, 
+  isEmpty, 
+  fadeIn, 
+  fadeOut, 
+  hashChange, 
+  getHashProperties, 
+  isFunction, 
+  RE_VIDEO, 
+  RE_YOUTUBE, 
+  RE_VIMEO 
+} from "book-of-spells"
 
 export class Modal {
   constructor(id, contentElement, options = {}, modallyInstance) {
@@ -8,9 +27,9 @@ export class Modal {
 
     // https://www.youtube.com/watch?v=gJ-WmYn_9GE
     this.videoRegEx = {};
-    this.videoRegEx.YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
-    this.videoRegEx.VIMEO = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
-    this.videoRegEx.VIDEO = /(.*\/[^\/]+\.mp4|ogg|ogv|ogm|webm|avi)\s?$/i;
+    this.videoRegEx.YOUTUBE = RE_YOUTUBE
+    this.videoRegEx.VIMEO = RE_VIMEO
+    this.videoRegEx.VIDEO = RE_VIDEO
     //TODO: add support for brightcove and cloudfront
     //TODO: automatic video modal detection
 
@@ -132,6 +151,7 @@ export class Modal {
         type: k.toLowerCase(),
         id: match[1]
       }
+      this.videoRegEx[k].lastIndex = 0
     }
     return false
   }
@@ -164,7 +184,7 @@ export class Modal {
     img.removeAttribute('hidden')
   } 
 
-  open(dataset) {
+  open(dataset, callback) {
     if (this.options.video && dataset && dataset.hasOwnProperty('video')) {
       this.mountVideo(dataset.video)
     }
@@ -173,12 +193,16 @@ export class Modal {
       this.mountImage(dataset.image)
     }
       
-    fadeIn(this.template)
+    fadeIn(this.template, () => {
+      if (isFunction(callback)) callback(this)
+    })
   }
 
-  close(dataset) {
+  close(dataset, callback) {
     fadeOut(this.template, () => {
       if (this.options.video) this.unmountVideo()
+
+      if (isFunction(callback)) callback(this)
 
       css(this.template, {
         'zIndex': this.zIndex
@@ -257,7 +281,7 @@ export class Modally {
     const modal = id instanceof Modal ? id : this.get(id)
     if (!modal) return
     modal.open(dataset)
-    if (!this.opened.length && this.options.disableScroll) disableScroll()
+    if (!this.opened.length && this.options.disableScroll) disableScroll(this.scrollbarWidth)
     this.opened.push(modal)
     css(modal.template, {
       'zIndex': modal.zIndex + this.opened.length
@@ -271,9 +295,10 @@ export class Modally {
 
     const modal = id instanceof Modal ? id : this.get(id)
     if (!modal) return
-    modal.close(dataset)
     this.opened.pop()
-    if (!this.opened.length && this.options.disableScroll) enableScroll()
+    modal.close(dataset, () => {
+      if (!this.opened.length && this.options.disableScroll) enableScroll(this.scrollbarWidth)
+    })
   }
 
   // Only after registering all modals

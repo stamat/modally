@@ -135,15 +135,22 @@
     return doc.body.firstChild;
   }
 
+  // node_modules/book-of-spells/src/regex.mjs
+  var RE_YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+  var RE_VIMEO = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
+  var RE_VIDEO = /(.*\/[^\/]+\.mp4|ogg|ogv|ogm|webm|avi)\s?$/i;
+  var RE_URL_PARAMETER = /([^\s=&]+)=?([^&\s]+)?/;
+
   // node_modules/book-of-spells/src/parsers.mjs
   function parseUrlParameters(paramString, decode = true) {
     const res = {};
     const paramParts = paramString.split("&");
     paramParts.forEach((part) => {
-      const m = part.match(/([^\s=&]+)=?([^&\s]+)?/);
+      const m = part.match(RE_URL_PARAMETER);
       const key = m[1];
       const value = m[2];
       res[key] = value !== void 0 && decode ? stringToType(decodeURIComponent(value)) : value;
+      RE_URL_PARAMETER.lastIndex = 0;
     });
     return res;
   }
@@ -165,12 +172,18 @@
     document.body.removeChild(scrollDiv);
     return scrollbarWidth;
   }
-  function disableScroll(shift = 0) {
-    const body = document.body;
-    body.style.overflow = "hidden";
-    body.style.paddingRight = `${shift}px`;
+  function hasVerticalScrollbarVisible(scrollbarWidth) {
+    if (scrollbarWidth === void 0)
+      scrollbarWidth = getScrollbarWidth();
+    return window.innerHeight < document.body.scrollHeight && scrollbarWidth > 0;
   }
-  function enableScroll(shift = 0) {
+  function disableScroll(shift) {
+    const body = document.body;
+    if (shift && hasVerticalScrollbarVisible(shift))
+      body.style.paddingRight = `${shift}px`;
+    body.style.overflow = "hidden";
+  }
+  function enableScroll(shift) {
     const body = document.body;
     body.style.overflow = "";
     if (shift)
@@ -281,9 +294,9 @@
       this.element = contentElement;
       this.modallyInstance = modallyInstance;
       this.videoRegEx = {};
-      this.videoRegEx.YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
-      this.videoRegEx.VIMEO = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
-      this.videoRegEx.VIDEO = /(.*\/[^\/]+\.mp4|ogg|ogv|ogm|webm|avi)\s?$/i;
+      this.videoRegEx.YOUTUBE = RE_YOUTUBE;
+      this.videoRegEx.VIMEO = RE_VIMEO;
+      this.videoRegEx.VIDEO = RE_VIDEO;
       this.options = {
         "landing": "body",
         "max-width": "none",
@@ -380,6 +393,7 @@
             type: k.toLowerCase(),
             id: match[1]
           };
+        this.videoRegEx[k].lastIndex = 0;
       }
       return false;
     }
@@ -408,19 +422,24 @@
       img.style.display = "block";
       img.removeAttribute("hidden");
     }
-    open(dataset) {
+    open(dataset, callback) {
       if (this.options.video && dataset && dataset.hasOwnProperty("video")) {
         this.mountVideo(dataset.video);
       }
       if (this.options.image && dataset && dataset.hasOwnProperty("image")) {
         this.mountImage(dataset.image);
       }
-      fadeIn(this.template);
+      fadeIn(this.template, () => {
+        if (isFunction(callback))
+          callback(this);
+      });
     }
-    close(dataset) {
+    close(dataset, callback) {
       fadeOut(this.template, () => {
         if (this.options.video)
           this.unmountVideo();
+        if (isFunction(callback))
+          callback(this);
         css(this.template, {
           "zIndex": this.zIndex
         });
@@ -490,7 +509,7 @@
         return;
       modal.open(dataset);
       if (!this.opened.length && this.options.disableScroll)
-        disableScroll();
+        disableScroll(this.scrollbarWidth);
       this.opened.push(modal);
       css(modal.template, {
         "zIndex": modal.zIndex + this.opened.length
@@ -503,10 +522,11 @@
       const modal = id instanceof Modal ? id : this.get(id);
       if (!modal)
         return;
-      modal.close(dataset);
       this.opened.pop();
-      if (!this.opened.length && this.options.disableScroll)
-        enableScroll();
+      modal.close(dataset, () => {
+        if (!this.opened.length && this.options.disableScroll)
+          enableScroll(this.scrollbarWidth);
+      });
     }
     // Only after registering all modals
     initHashCheck() {
