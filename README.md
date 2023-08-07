@@ -12,8 +12,9 @@ But regardless, **life is short - make reusable code!**
 
 ## Features
 * **Simplest one yet** - almost everything is automatic (or at least it should be 😅)
+* **ESM and IIFE** - use it as a module or as a script
 * **HTML auto-wrapped**
-* **State classes** = blurred background
+* **State body classes**
 * **Vertically centered**
 * **Scroll blocking** 
 * **Nested** - automatic detection, no need for additional coding
