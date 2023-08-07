@@ -75,9 +75,24 @@ Property | Default | Accepts | Description
 **max-width** | 'none' | 'none' or number | Defines maximum width of the modal window, just like max-width css property
 **vertical-align** | 'middle' | 'middle' or 'top' or 'bottom' | Vertical orientation of the modal window, like vertical-align css property
 **close-parent** | false | boolean | Whether to close the parent modal window, parent window is automatically selected if a modal open is triggered within another modal
-**close-other** | false | boolean | Wether to close all other opened modals upon opening this modal
+**close-others** | false | boolean | Wether to close all other opened modals upon opening this modal
 **video** | false | boolean | For creating a video modal
 **autoplay** | true | boolean | Whether video modal should autoplay
+**template** | default modally template :point-down: | HTML string | Template of the modal window
+
+```html
+<div class="modally-wrap">
+	<div class="modally-table">
+		<div class="modally-cell">
+			<div class="modally-underlay modally-close"></div>
+			<div class="modally" role="dialog" aria-modal="true">
+				<button tabindex="1" class="modally-close modally-close-button">&times;</button>
+				<div class="modally-content"></div>
+			</div>
+		</div>
+	</div>
+</div>
+```
 
 ## Events
 

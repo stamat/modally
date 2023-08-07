@@ -41,7 +41,7 @@ export class Modal {
       classes: '',
       verticalAlign: 'middle',
       closeParent: false,
-      closeOther: false,
+      closeOthers: false,
       image: false,
       video: false,
       autoplay: true,
@@ -74,6 +74,8 @@ export class Modal {
 
     shallowMerge(this.options, options)
 
+    this.template = parseDOM(this.options.template)
+
     if (this.element) {
       for (const k in this.options) {
         const key = /^[a-z0-9]+$/.test(k) ? k : transformCamelCaseToDash(k)
@@ -81,10 +83,11 @@ export class Modal {
           this.options[k] = stringToType(this.element.getAttribute(`modally-${key}`))
         }
       }
+
+      if (this.element.hasAttribute('id')) this.element.removeAttribute('id')
     }
 
-    this.template = parseDOM(this.options.template)
-    this.template.setAttribute('modally-id', this.id)
+    this.template.setAttribute('id', this.id)
 
     const modallyElement = this.template.querySelector('.modally')
     if (modallyElement) {
@@ -304,6 +307,10 @@ export class Modally {
   open(id, dataset) {
     const modal = id instanceof Modal ? id : this.get(id)
     if (!modal) return
+
+    if (modal.options.closeParent) this.close()
+    if (modal.options.closeOthers) [...this.opened].forEach((modal) => this.close(modal))
+
     modal.open(dataset)
     if (!this.opened.length && this.options.disableScroll) disableScroll(this.scrollbarWidth)
     this.opened.push(modal)

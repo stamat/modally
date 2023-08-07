@@ -306,7 +306,7 @@
         classes: "",
         verticalAlign: "middle",
         closeParent: false,
-        closeOther: false,
+        closeOthers: false,
         image: false,
         video: false,
         autoplay: true,
@@ -335,6 +335,7 @@
         options = tempOptions;
       }
       shallowMerge(this.options, options);
+      this.template = parseDOM(this.options.template);
       if (this.element) {
         for (const k in this.options) {
           const key = /^[a-z0-9]+$/.test(k) ? k : transformCamelCaseToDash(k);
@@ -342,9 +343,10 @@
             this.options[k] = stringToType(this.element.getAttribute(`modally-${key}`));
           }
         }
+        if (this.element.hasAttribute("id"))
+          this.element.removeAttribute("id");
       }
-      this.template = parseDOM(this.options.template);
-      this.template.setAttribute("modally-id", this.id);
+      this.template.setAttribute("id", this.id);
       const modallyElement = this.template.querySelector(".modally");
       if (modallyElement) {
         css(modallyElement, {
@@ -530,6 +532,10 @@
       const modal = id instanceof Modal ? id : this.get(id);
       if (!modal)
         return;
+      if (modal.options.closeParent)
+        this.close();
+      if (modal.options.closeOthers)
+        [...this.opened].forEach((modal2) => this.close(modal2));
       modal.open(dataset);
       if (!this.opened.length && this.options.disableScroll)
         disableScroll(this.scrollbarWidth);
