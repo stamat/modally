@@ -1,6 +1,6 @@
-![jquery.modally](https://imgur.com/4OAlRoz.png)
+# 🪟 Modally [![npm version](https://img.shields.io/npm/v/modally)](https://www.npmjs.com/package/modally)
 
-[![npm version](https://img.shields.io/npm/v/modally)](https://www.npmjs.com/package/modally)
+> Your trusty nested modal ally
 
 If there are many different variations of the same functionality, the rule says it's easy to make. And the same goes for web modal dialogues - they are super easy to make.
 
@@ -48,8 +48,8 @@ But regardless, **life is short - make reusable code!**
 	modally.add('your-video-modal', {video: true});
 ```
 ```html
-	<a href="#your-video-modal" target="_modal" data-video="https://www.youtube.com/watch?v=u9QJo5fBADE"></a>
-	<a href="#your-video-modal" target="_modal" data-video="https://vimeo.com/243244233"></a>
+	<a href="#your-video-modal" target="_modal" data-video="https://www.youtube.com/watch?v=u9QJo5fBADE">Youtube</a>
+	<button type="button" target="_modal:open:your-video-modal" data-video="https://vimeo.com/243244233">Vimeo</button>
 ```
 
 ### Advanced Usage
