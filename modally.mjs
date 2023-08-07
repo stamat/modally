@@ -348,7 +348,7 @@ export class Modally {
     if (modal.options.closeParent) this.close()
     if (modal.options.closeOthers) [...this.opened].forEach((modal) => this.close(modal))
 
-    modal.dispatchEvents('opening')
+    modal.dispatchEvents('open')
 
     if (!this.opened.length && this.options.disableScroll) disableScroll(this.scrollbarWidth)
     if (!this.opened.length) document.body.classList.add('modally-open')
@@ -372,7 +372,7 @@ export class Modally {
     if (!modal) return
     this.opened.pop()
 
-    modal.dispatchEvents('closing')
+    modal.dispatchEvents('close')
 
     modal.close(dataset, () => {
       if (!this.opened.length && this.options.disableScroll) enableScroll(this.scrollbarWidth)

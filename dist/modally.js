@@ -1,4 +1,4 @@
-/* modally v1.1.0 | undefined | MIT License */
+/* modally v1.1.1 | undefined | MIT License */
 (() => {
   // node_modules/book-of-spells/src/helpers.mjs
   function shallowMerge(target, source) {
@@ -571,7 +571,7 @@
         this.close();
       if (modal.options.closeOthers)
         [...this.opened].forEach((modal2) => this.close(modal2));
-      modal.dispatchEvents("opening");
+      modal.dispatchEvents("open");
       if (!this.opened.length && this.options.disableScroll)
         disableScroll(this.scrollbarWidth);
       if (!this.opened.length)
@@ -592,7 +592,7 @@
       if (!modal)
         return;
       this.opened.pop();
-      modal.dispatchEvents("closing");
+      modal.dispatchEvents("close");
       modal.close(dataset, () => {
         if (!this.opened.length && this.options.disableScroll)
           enableScroll(this.scrollbarWidth);
