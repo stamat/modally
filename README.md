@@ -12,6 +12,22 @@ But regardless, **life is short - make reusable code!**
 
 ![Imgur](https://imgur.com/Zzg3FDx.png)
 
+## Installation
+
+```bash
+npm i modally
+```
+
+Use it as a module
+```javascript
+import Modally from 'modally';
+```
+
+Or as an IIFE script, Modally will be available as a global variable, or as a jQuery plugin if jQuery is present `$(selector).modally(options)`
+```html
+<script src="path/to/modally.min.js"></script>
+```
+
 ## Features
 * **Simplest one yet** - almost everything is automatic (or at least it should be 😅)
 * **ESM and IIFE** - use it as a module or as a script
