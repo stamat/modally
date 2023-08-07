@@ -469,6 +469,12 @@
         });
       });
     }
+    dispatchEvents(eventName) {
+      if (this.element)
+        this.element.dispatchEvent(new CustomEvent(`modally:${eventName}`, { detail: this }));
+      this.template.dispatchEvent(new CustomEvent(`modally:${eventName}`, { detail: this }));
+      document.dispatchEvent(new CustomEvent(`modally:${eventName}:${this.id}`, { detail: this }));
+    }
   };
   var Modally = class {
     constructor(options) {
@@ -539,6 +545,7 @@
         delete options.element;
       }
       this.index[id] = new Modal(id, element, options, this);
+      this.index[id].dispatchEvents("added");
     }
     get(id) {
       return this.index[id];
@@ -551,7 +558,7 @@
         this.close();
       if (modal.options.closeOthers)
         [...this.opened].forEach((modal2) => this.close(modal2));
-      modal.open(dataset);
+      modal.dispatchEvents("opening");
       if (!this.opened.length && this.options.disableScroll)
         disableScroll(this.scrollbarWidth);
       if (!this.opened.length)
@@ -559,6 +566,9 @@
       this.opened.push(modal);
       css(modal.template, {
         "zIndex": modal.zIndex + this.opened.length
+      });
+      modal.open(dataset, () => {
+        modal.dispatchEvents("opened");
       });
     }
     close(id, dataset) {
@@ -569,11 +579,13 @@
       if (!modal)
         return;
       this.opened.pop();
+      modal.dispatchEvents("closing");
       modal.close(dataset, () => {
         if (!this.opened.length && this.options.disableScroll)
           enableScroll(this.scrollbarWidth);
         if (!this.opened.length)
           document.body.classList.remove("modally-open");
+        modal.dispatchEvents("closed");
       });
     }
     // Only after registering all modals

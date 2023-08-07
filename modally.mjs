@@ -235,6 +235,12 @@ export class Modal {
       })
     })
   }
+
+  dispatchEvents(eventName) {
+    if (this.element) this.element.dispatchEvent(new CustomEvent(`modally:${eventName}`, { detail: this }))
+    this.template.dispatchEvent(new CustomEvent(`modally:${eventName}`, { detail: this }))
+    document.dispatchEvent(new CustomEvent(`modally:${eventName}:${this.id}`, { detail: this }))
+  }
 }
 
 export class Modally {
@@ -317,6 +323,7 @@ export class Modally {
     }
 
     this.index[id] = new Modal(id, element, options, this)
+    this.index[id].dispatchEvents('added')
   }
 
   get(id) {
@@ -330,13 +337,18 @@ export class Modally {
     if (modal.options.closeParent) this.close()
     if (modal.options.closeOthers) [...this.opened].forEach((modal) => this.close(modal))
 
-    modal.open(dataset)
+    modal.dispatchEvents('opening')
+
     if (!this.opened.length && this.options.disableScroll) disableScroll(this.scrollbarWidth)
     if (!this.opened.length) document.body.classList.add('modally-open')
 
     this.opened.push(modal)
     css(modal.template, {
       'zIndex': modal.zIndex + this.opened.length
+    })
+
+    modal.open(dataset, () => {
+      modal.dispatchEvents('opened')
     })
   }
 
@@ -348,9 +360,14 @@ export class Modally {
     const modal = id instanceof Modal ? id : this.get(id)
     if (!modal) return
     this.opened.pop()
+
+    modal.dispatchEvents('closing')
+
     modal.close(dataset, () => {
       if (!this.opened.length && this.options.disableScroll) enableScroll(this.scrollbarWidth)
       if (!this.opened.length) document.body.classList.remove('modally-open')
+
+      modal.dispatchEvents('closed')
     })
   }
 
