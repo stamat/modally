@@ -110,15 +110,15 @@ Event | Element/s | Description
 - [x] ~~Youtube and Vimeo modals~~
 - [x] ~~Close on <ESC> key~~
 - [x] ~~Scrollbar fix on prevent scroll~~
-- [ ] Fix scroll issue on child modal close
+- [x] ~~Fix scroll issue on child modal close~~
 - [x] ~~Test events, remove multiple triggers~~
 - [x] ~~Target element modal template injection~~
-- [ ] CSS animations
+- [x] ~~CSS animations~~
 - [ ] Accessibility W3 aria #1
-- [ ] Image lightbox ability
+- [x] ~~Image lightbox ability~~
 - [ ] iframe in modal automation
-- [ ] responsive properties change - needs deep extend
-- [ ] Modal manager class - refactoring bulky code
+- [ ] responsive properties change - needs deep extend ??? (I can't remember what I meant here)
+- [x] ~~Modal manager class - refactoring bulky code~~
 
 ## Tested with :heart:
 
