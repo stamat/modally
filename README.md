@@ -35,36 +35,36 @@ But regardless, **life is short - make reusable code!**
 	modally.add('your-content');
 ```
 ```html
-	<div id="your-content" style="display:none;"><h1>Hello world!</h1></div>
-	<a href="#your-content" target="_modal"></a>
+<div id="your-content" style="display:none;"><h1>Hello world!</h1></div>
+<a href="#your-content" target="_modal"></a>
 ```
 
 ### Youtube and Vimeo modals
 
 ```javascript
-	const modally = new Modally();
+const modally = new Modally();
 
-	//creates a video modal which looks for data-video and opens a Youtube or Vimeo embed within your modal
-	modally.add('your-video-modal', {video: true});
+//creates a video modal which looks for data-video and opens a Youtube or Vimeo embed within your modal
+modally.add('your-video-modal', {video: true});
 ```
 ```html
-	<a href="#your-video-modal" target="_modal" data-video="https://www.youtube.com/watch?v=u9QJo5fBADE">Youtube</a>
-	<button type="button" target="_modal:open:your-video-modal" data-video="https://vimeo.com/243244233">Vimeo</button>
+<a href="#your-video-modal" target="_modal" data-video="https://www.youtube.com/watch?v=u9QJo5fBADE">Youtube</a>
+<button type="button" target="_modal:open:your-video-modal" data-video="https://vimeo.com/243244233">Vimeo</button>
 ```
 
 ### Advanced Usage
 
 ```javascript
-		const modally = new Modally();
-		modally.add('advanced-example');
+const modally = new Modally();
+modally.add('advanced-example');
 
-		document.addEventListener('modally:opening:advanced-example', function(e) {
-			console.log(e.detail);
-			e.detail.template.querySelector('.modally-content').innerHTML = 'Hello world!';
-		});
+document.addEventListener('modally:opening:advanced-example', function(e) {
+	console.log(e.detail);
+	e.detail.template.querySelector('.modally-content').innerHTML = 'Hello world!';
+});
 ```
 ```html
-	<a href="#advanced-example" target="_modal"></a>
+<a href="#advanced-example" target="_modal"></a>
 ```
 
 
