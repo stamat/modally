@@ -215,6 +215,8 @@ export class Modal {
     if (this.options.image && dataset && dataset.hasOwnProperty('image')) {
       this.mountImage(dataset.image)
     }
+
+    document.body.classList.add(`modally-${this.id}`)
       
     fadeIn(this.template, () => {
       if (isFunction(callback)) callback(this)
@@ -224,6 +226,7 @@ export class Modal {
   close(dataset, callback) {
     fadeOut(this.template, () => {
       if (this.options.video) this.unmountVideo()
+      document.body.classList.remove(`modally-${this.id}`)
 
       if (isFunction(callback)) callback(this)
 
@@ -329,6 +332,8 @@ export class Modally {
 
     modal.open(dataset)
     if (!this.opened.length && this.options.disableScroll) disableScroll(this.scrollbarWidth)
+    if (!this.opened.length) document.body.classList.add('modally-open')
+
     this.opened.push(modal)
     css(modal.template, {
       'zIndex': modal.zIndex + this.opened.length
@@ -345,6 +350,7 @@ export class Modally {
     this.opened.pop()
     modal.close(dataset, () => {
       if (!this.opened.length && this.options.disableScroll) enableScroll(this.scrollbarWidth)
+      if (!this.opened.length) document.body.classList.remove('modally-open')
     })
   }
 
