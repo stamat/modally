@@ -14,6 +14,8 @@ import {
   hashChange, 
   getHashProperties, 
   isFunction, 
+  transformDashToCamelCase,
+  transformCamelCaseToDash,
   RE_VIDEO, 
   RE_YOUTUBE, 
   RE_VIMEO 
@@ -34,27 +36,49 @@ export class Modal {
     //TODO: automatic video modal detection
 
     this.options = {
-      'landing': 'body',
-      'max-width': 'none',
-      'classes': '',
-      'vertical-align': 'middle',
-      'close-parent': false,
-      'close-other': false,
-      'image': false,
-      'video': false,
-      'autoplay': true,
-      'template': '<div class="modally-wrap"><div class="modally-table"><div class="modally-cell"><div class="modally-underlay modally-close"></div><div class="modally" role="dialog" aria-modal="true"><button tabindex="1" class="modally-close modally-close-button">&times;</button><div class="modally-content"></div></div></div></div></div>',
+      landing: 'body',
+      maxWidth: 'none',
+      classes: '',
+      verticalAlign: 'middle',
+      closeParent: false,
+      closeOther: false,
+      image: false,
+      video: false,
+      autoplay: true,
+      template: `
+        <div class="modally-wrap">
+          <div class="modally-table">
+            <div class="modally-cell">
+              <div class="modally-underlay modally-close"></div>
+              <div class="modally" role="dialog" aria-modal="true">
+                <button tabindex="1" class="modally-close modally-close-button">&times;</button>
+                <div class="modally-content"></div>
+              </div>
+            </div>
+          </div>
+        </div>`,
     }
 
     const landing = this.options.hasOwnProperty('landing') && this.options.landing instanceof HTMLElement ? this.options.landing : document.querySelector(this.options.landing)
     if (!landing) return
 
-    shallowMerge(this.options, options);
+    // transform camelCase to dash-case
+    if (options) {
+      const tempOptions = {}
+      for (const k in options) {
+        const key = /^[a-z0-9]+$/i.test(k) ? k : transformDashToCamelCase(k)
+        tempOptions[key] = options[k]
+      }
+      options = tempOptions
+    }
+
+    shallowMerge(this.options, options)
 
     if (this.element) {
       for (const k in this.options) {
-        if (this.element.hasAttribute(`modally-${k}`)) {
-          this.options[k] = stringToType(this.element.getAttribute(`modally-${k}`))
+        const key = /^[a-z0-9]+$/.test(k) ? k : transformCamelCaseToDash(k)
+        if (this.element.hasAttribute(`modally-${key}`)) {
+          this.options[k] = stringToType(this.element.getAttribute(`modally-${key}`))
         }
       }
     }
@@ -65,14 +89,14 @@ export class Modal {
     const modallyElement = this.template.querySelector('.modally')
     if (modallyElement) {
       css(modallyElement, {
-        'maxWidth': this.options['max-width']
+        'maxWidth': this.options.maxWidth
       })
     }
 
     const modallyCellElement = this.template.querySelector('.modally-cell')
     if (modallyCellElement) {
       css(modallyCellElement, {
-        'verticalAlign': this.options['vertical-align']
+        'verticalAlign': this.options.verticalAlign
       })
     }
 
