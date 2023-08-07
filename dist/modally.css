@@ -1,8 +1,4 @@
 /* modally v1.1.0 | undefined | MIT License */
-.modally-init {
-  display: none;
-}
-
 .modally-wrap {
   height: 100%;
   position: fixed;

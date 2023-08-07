@@ -371,9 +371,6 @@
           this.template.querySelector(".modally-content").appendChild(ghost);
         }
       }
-      if (this.element && this.element.classList.contains("modally-init")) {
-        this.element.classList.remove("modally-init");
-      }
       if (this.element) {
         this.element.style.display = "";
         this.element.removeAttribute("hidden");
@@ -481,6 +478,16 @@
       this.scrollbarWidth = getScrollbarWidth();
       if (options)
         shallowMerge(this.options, options);
+      if (this.options.selector) {
+        const elements = document.querySelectorAll(this.options.selector);
+        elements.forEach((el) => {
+          if (el.hasAttribute("id")) {
+            const className = this.options.selector.replace(".", "");
+            el.classList.remove(className);
+            this.add(el.getAttribute("id"), { element: el });
+          }
+        });
+      }
       document.addEventListener("click", (e) => {
         const target = e.target;
         if (!target.matches('[target^="_modal"]:not([disabled])'))
@@ -521,8 +528,14 @@
       let element = document.getElementById(id);
       if (!options)
         options = {};
-      if (!element && options.selector)
+      if (!element && options.selector) {
         element = isString(options.selector) ? document.querySelector(options.selector) : options.selector;
+        delete options.selector;
+      }
+      if (!element && options.element) {
+        element = options.element;
+        delete options.element;
+      }
       this.index[id] = new Modal(id, element, options, this);
     }
     get(id) {

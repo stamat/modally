@@ -121,10 +121,6 @@ export class Modal {
       }
     }
 
-    if (this.element && this.element.classList.contains('modally-init')) {
-      this.element.classList.remove('modally-init')
-    }
-
     if (this.element) {
       this.element.style.display = ''
       this.element.removeAttribute('hidden')
@@ -250,6 +246,18 @@ export class Modally {
 
     if (options) shallowMerge(this.options, options)
 
+    if (this.options.selector) {
+      const elements = document.querySelectorAll(this.options.selector)
+      elements.forEach((el) => {
+        if (el.hasAttribute('id')) {
+          // TODO: what if the selector is not only one class, but an attribute? Maybe we don't need to remove anything?
+          const className = this.options.selector.replace('.', '')
+          el.classList.remove(className)
+          this.add(el.getAttribute('id'), { element: el })
+        }
+      })
+    }
+
     document.addEventListener('click', (e) => {
       const target = e.target
 
@@ -295,7 +303,15 @@ export class Modally {
   add(id, options) {
     let element = document.getElementById(id)
     if (!options) options = {}
-    if (!element && options.selector) element = isString(options.selector) ? document.querySelector(options.selector) : options.selector
+    if (!element && options.selector) {
+      element = isString(options.selector) ? document.querySelector(options.selector) : options.selector
+      delete options.selector
+    }
+    
+    if (!element && options.element) {
+      element = options.element
+      delete options.element
+    }
 
     this.index[id] = new Modal(id, element, options, this)
   }

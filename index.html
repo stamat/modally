@@ -239,14 +239,14 @@
                         </div>
                     </div>
                 </div>
-                <div id="lorem" style="display:none" class="modally-init" modally-max-width="1000">
+                <div id="lorem" hidden class="modally-init" modally-max-width="1000">
                     <h1 class="modal-title">Hey there!</h1>
                     <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Yes I am this lazy.</p>
                     <div class="button-wrap">
                         <a target="_modal:close" class="button small">Close me!</a><a href="#ipsum" target="_modal" class="button gradient small">Open 2nd one!</a>
                     </div>
                 </div>
-                <div id="ipsum" style="display:none">
+                <div id="ipsum" hidden>
                     <h1 class="modal-title">You still here?!</h1>
                     <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Yes I am this lazy.</p>
 
@@ -255,7 +255,7 @@
                     </div>
                 </div>
 
-                <div id="dolor" style="display:none" modally-max-width="500">
+                <div id="dolor" hidden modally-max-width="500">
                     <h1 class="modal-title">I'm the last one.</h1>
                     <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Yes I am this lazy.</p>
 
@@ -268,7 +268,8 @@
         </div>
         <script type="text/javascript">
             const modally = new Modally({
-                disableScroll: true
+                disableScroll: true,
+                selector: '.modally-init',
             })
             
             modally.add('ipsum', {
@@ -276,11 +277,9 @@
                 selector: '#ipsum'
             })
 
-            modally.add('lorem')
+            //modally.add('lorem')
 
-            modally.add('dolor', {
-                closeOthers: true
-            })
+            modally.add('dolor')
 
             modally.add('video-modal', {
                 video: true,
