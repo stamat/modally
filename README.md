@@ -1,5 +1,7 @@
 ![jquery.modally](https://imgur.com/4OAlRoz.png)
 
+[![npm version](https://img.shields.io/npm/v/modally)](https://www.npmjs.com/package/modally)
+
 If there are many different variations of the same functionality, the rule says it's easy to make. And the same goes for web modal dialogues - they are super easy to make.
 
 I created this web modal dialog library as a repo cause I wrote the same code for every project that required modals, over and over again throughout the years, just because it's trivial and I needed "5 minutes" to make it.
