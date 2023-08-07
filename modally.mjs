@@ -310,7 +310,16 @@ export class Modally {
   }
 
   add(id, options) {
-    let element = document.getElementById(id)
+    if (!id) return
+
+    let element
+    if (id instanceof HTMLElement) {
+      element = id
+      id = id.getAttribute('id')
+    } else {
+      element = document.getElementById(id)
+    }
+    
     if (!options) options = {}
     if (!element && options.selector) {
       element = isString(options.selector) ? document.querySelector(options.selector) : options.selector
@@ -324,6 +333,8 @@ export class Modally {
 
     this.index[id] = new Modal(id, element, options, this)
     this.index[id].dispatchEvents('added')
+
+    this.initHashCheck()
   }
 
   get(id) {
@@ -375,7 +386,7 @@ export class Modally {
   initHashCheck() {
     hashChange((hash) => {
       this.modallyHashCheck(hash)
-    })
+    }, 'modallyHashCheckListenerInitialized')
   }
 }
 

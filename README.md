@@ -20,6 +20,7 @@ But regardless, **life is short - make reusable code!**
 * **Video embeddable** - automatic Vimeo and Youtube embeds with autoplay
 * **ESC closable**
 * **Infinitely customizable** - go f**king wild 🎉
+* **Can be used with any framework** - no dependencies, no jQuery, no nothing, but you can use it with jQuery if you want to, iife file has a jQuery plugin wrapper `$(selector).modally(options)`
 
 ## Usage
 
@@ -54,12 +55,9 @@ But regardless, **life is short - make reusable code!**
 		const modally = new Modally();
 		modally.add('advanced-example');
 
-		document.addEventListener('modally:opening:advanced-example', function(ev, e, modally) {
-			modally.$template.find('.modally-content').empty();
-
-			/* GENERATE YOUR CONTENT */
-
-			modally.$template.find('.modally-content').append(/* APPEND YOUR CONTENT */);
+		document.addEventListener('modally:opening:advanced-example', function(e) {
+			console.log(e.detail);
+			e.detail.template.querySelector('.modally-content').innerHTML = 'Hello world!';
 		});
 ```
 ```html
@@ -99,9 +97,9 @@ Property | Default | Accepts | Description
 Event | Element/s | Description
 ----- | --------- | -----------
 **modally:init** | |
-**modally:opening** | |
+**modally:open** | |
 **modally:opened** | |
-**modally:closing** | |
+**modally:close** | |
 **modally:closed** | |
 
 ## //TODO:

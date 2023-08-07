@@ -203,8 +203,12 @@
     if (!isEmpty(hash))
       callback(hash);
   }
-  function hashChange(callback) {
+  function hashChange(callback, single) {
     onHashChange(callback);
+    if (single && window[single])
+      return;
+    if (single)
+      window[single] = true;
     window.addEventListener("hashchange", () => {
       onHashChange(callback);
     });
@@ -533,7 +537,15 @@
       }
     }
     add(id, options) {
-      let element = document.getElementById(id);
+      if (!id)
+        return;
+      let element;
+      if (id instanceof HTMLElement) {
+        element = id;
+        id = id.getAttribute("id");
+      } else {
+        element = document.getElementById(id);
+      }
       if (!options)
         options = {};
       if (!element && options.selector) {
@@ -546,6 +558,7 @@
       }
       this.index[id] = new Modal(id, element, options, this);
       this.index[id].dispatchEvents("added");
+      this.initHashCheck();
     }
     get(id) {
       return this.index[id];
@@ -592,7 +605,7 @@
     initHashCheck() {
       hashChange((hash) => {
         this.modallyHashCheck(hash);
-      });
+      }, "modallyHashCheckListenerInitialized");
     }
   };
   var modally_default = Modally;
@@ -600,6 +613,22 @@
   // build/iife.js
   if (!window.Modally) {
     window.Modally = modally_default;
+  }
+  if (window.hasOwnProperty("jQuery") || window.hasOwnProperty("$")) {
+    (function($2) {
+      $2.fn.modally = function(options) {
+        if (!window.hasOwnProperty("jQueryModally")) {
+          window.jQueryModally = new modally_default({
+            disableScroll: true,
+            selector: ".modally-init"
+          });
+        }
+        return this.each(function() {
+          options.element = this;
+          window.jQueryModally.add(this, options);
+        });
+      };
+    })(jQuery || $);
   }
 })();
 //# sourceMappingURL=modally.js.map
