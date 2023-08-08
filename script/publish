@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * This script is used to publish a new version of the package. 
+ * This script is used to publish a new version of the package.
  * It can automatically increment the patch version if no version is specified in the package.json and commit the changes.
  * It can also automatically tag and push the tags.
  * Using GH CLI, it can also create a release.
- * 
+ *
  * Fucking awesome, right?
- * 
+ *
  * With love, @stamat
  */
 const readline = require('readline')
@@ -20,7 +20,7 @@ const packageJson = require(path.join(process.cwd(), './package.json'))
 
 if (!packageJson.version) {
   console.log('No version found in package.json')
-  return
+  process.exit(1)
 }
 
 const rl = readline.createInterface({
@@ -31,12 +31,12 @@ const rl = readline.createInterface({
 if (version && !isValidVersion(version)) {
   console.log('Invalid version: ', version)
   console.log('Current version: ', packageJson.version)
-  return
+  process.exit(1)
 }
 
 if (version && packageJson.version === version) {
-  console.log('Version is already set to ', version)
-  return
+  console.log('Version is already ', version)
+  process.exit(1)
 }
 
 if (!version) {
@@ -47,11 +47,10 @@ if (!version) {
       publish(version)
     } else {
       console.log('Aborted')
+      process.exit(0)
     }
     rl.close()
   })
-
-  return
 } else {
   publish(version)
 }
@@ -66,10 +65,14 @@ function incrementPatchVersion(version) {
   return `${parts[0]}.${parts[1]}.${patch}`
 }
 
-function run(cmd) {
+function run(cmd, exitOnError = true) {
   console.log(cmd)
-  const out = execSync(cmd)
-  console.log(out.toString())
+  try {
+    const out = execSync(cmd)
+    console.log(out.toString())
+  } catch (e) {
+    if (exitOnError) process.exit(1)
+  }
 }
 
 function publish(version) {
@@ -78,24 +81,31 @@ function publish(version) {
 
   run('git add package.json')
   run(`git commit -m "Bump version to ${version}"`)
+
+  if (fs.existsSync(path.join(process.cwd(), 'script/build'))) {
+    run('script/build')
+    execSync('git add .')
+    execSync(`git commit -m "Build version ${version}"`)
+  }
+
   run(`git tag v${version}`)
   run('git push')
-  run(`git push --tags`)
-  
-  rl.question(`Do you want to create a release on GitHub? (y/n) `, (answer) => {
+  run('git push --tags')
+
+  rl.question('Do you want to create a release on GitHub? (y/n) ', (answer) => {
     if (answer === 'y') {
       let notesArg = '--generate-notes'
-      rl.question(`Enter notes for the release (optional): `, (notes) => {
+      rl.question('Enter notes for the release (optional): ', (notes) => {
         if (notes.trim() !== '') {
           notesArg = `--notes "${notes}"`
         }
+        run(`gh release create v${version} --title "v${version}" ${notesArg} --latest`)
+        run('npm publish', true)
         rl.close()
       })
-    run(`gh release create v${version} --title "v${version}" ${notesArg} --latest`)
     } else {
-      console.log('Aborted')
+      run('npm publish')
+      rl.close()
     }
   })
-
-  run ('npm publish')
 }
