@@ -1,4 +1,15 @@
 #!/usr/bin/env node
+
+/**
+ * This script is used to publish a new version of the package. 
+ * It can automatically increment the patch version if no version is specified in the package.json and commit the changes.
+ * It can also automatically tag and push the tags.
+ * Using GH CLI, it can also create a release.
+ * 
+ * Fucking awesome, right?
+ * 
+ * With love, @stamat
+ */
 const readline = require('readline')
 const { execSync } = require('child_process')
 const fs = require('fs')
