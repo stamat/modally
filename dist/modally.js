@@ -501,8 +501,10 @@
         });
       }
       document.addEventListener("click", (e) => {
-        const target = e.target;
+        let target = e.target;
         if (!target.matches('[target^="_modal"]:not([disabled])'))
+          target = target.closest('[target^="_modal"]:not([disabled])');
+        if (!target)
           return;
         const targetQuery = target.getAttribute("target").replace("_modal:", "");
         const targetQueryParts = targetQuery.split(":");
