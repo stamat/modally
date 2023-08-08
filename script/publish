@@ -88,5 +88,3 @@ function publish(version) {
 
   run ('npm publish')
 }
-
-
