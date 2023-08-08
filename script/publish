@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 const readline = require('readline')
-const { exec } = require('child_process')
+const { execSync } = require('child_process')
 const fs = require('fs')
 const path = require('path')
-const semver = require('semver')
 let version = process.argv[2]
 
 const packageJson = require(path.join(process.cwd(), './package.json'))
@@ -18,7 +17,7 @@ const rl = readline.createInterface({
   output: process.stdout
 })
 
-if (version && !semver.valid(version)) {
+if (version && !isValidVersion(version)) {
   console.log('Invalid version: ', version)
   console.log('Current version: ', packageJson.version)
   return
@@ -31,8 +30,8 @@ if (version && packageJson.version === version) {
 
 if (!version) {
   console.log('Current version: ', packageJson.version)
-  version = semver.inc(packageJson.version, 'patch')
-  rl.question(`Fo you want to increment the version to ${version}? (y/n) `, (answer) => {
+  version = incrementPatchVersion(packageJson.version)
+  rl.question(`Do you want to increment the version to ${version}? (y/n) `, (answer) => {
     if (answer === 'y') {
       publish(version)
     } else {
@@ -46,18 +45,20 @@ if (!version) {
   publish(version)
 }
 
-function execCallback(err, stdout, stderr) {
-  if (err) {
-    console.error(err)
-    return
-  }
-  console.log(stdout)
-  console.log(stderr)
+function isValidVersion(version) {
+  return /^(\d+)\.(\d+)\.(\d+)(?:-([\w-]+(?:\.[\w-]+)*))?(?:\+([\w-]+(?:\.[\w-]+)*))?$/.test(version)
+}
+
+function incrementPatchVersion(version) {
+  const parts = version.split('.')
+  const patch = parseInt(parts[2]) + 1
+  return `${parts[0]}.${parts[1]}.${patch}`
 }
 
 function run(cmd) {
   console.log(cmd)
-  exec(cmd, execCallback)
+  const out = execSync(cmd)
+  console.log(out.toString())
 }
 
 function publish(version) {
@@ -69,6 +70,22 @@ function publish(version) {
   run(`git tag v${version}`)
   run('git push')
   run(`git push --tags`)
+  
+  rl.question(`Do you want to create a release on GitHub? (y/n) `, (answer) => {
+    if (answer === 'y') {
+      let notesArg = '--generate-notes'
+      rl.question(`Enter notes for the release (optional): `, (notes) => {
+        if (notes.trim() !== '') {
+          notesArg = `--notes "${notes}"`
+        }
+        rl.close()
+      })
+    run(`gh release create v${version} --title "v${version}" ${notesArg} --latest`)
+    } else {
+      console.log('Aborted')
+    }
+  })
+
   run ('npm publish')
 }
 
