@@ -18,7 +18,8 @@ import {
   transformCamelCaseToDash,
   RE_VIDEO, 
   RE_YOUTUBE, 
-  RE_VIMEO 
+  RE_VIMEO,
+  on,
 } from "book-of-spells"
 
 export class Modal {
@@ -267,13 +268,8 @@ export class Modally {
       })
     }
 
-    document.addEventListener('click', (e) => {
-      let target = e.target
-
-      if (!target.matches('[target^="_modal"]:not([disabled])'))
-        target = target.closest('[target^="_modal"]:not([disabled])')
-
-      if (!target) return
+    on('[target^="_modal"]', 'click', (e, target) => {
+      if (!target || target.matches('[disabled]')) return
       const targetQuery = target.getAttribute('target').replace('_modal:', '')
       const targetQueryParts = targetQuery.split(':')
       const href = target.getAttribute('href')
