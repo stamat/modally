@@ -1,4 +1,4 @@
-/* modally v1.1.1 | undefined | MIT License */
+/* modally v1.1.2 | undefined | MIT License */
 (() => {
   // node_modules/book-of-spells/src/helpers.mjs
   function shallowMerge(target, source) {
@@ -132,10 +132,60 @@
     }
     return element;
   }
-  function parseDOM(html) {
+  function parseDOM(html, allChildren) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
-    return doc.body.firstChild;
+    return !allChildren ? doc.body.firstChild : doc.body.childNodes;
+  }
+  function delegateEvent(selector, eventType, handler) {
+    if (typeof MutationObserver === "undefined") {
+      document.addEventListener(eventType, (e) => {
+        const target = e.target.closest(selector);
+        if (target)
+          handler(e, target);
+      });
+      return null;
+    }
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (!(node instanceof HTMLElement))
+            continue;
+          if (!node.matches(selector))
+            continue;
+          node.addEventListener(eventType, (e) => {
+            handler(e, e.currentTarget);
+          });
+        }
+      }
+    });
+    for (const node of document.querySelectorAll(selector)) {
+      node.addEventListener(eventType, (e) => {
+        handler(e, e.currentTarget);
+      });
+    }
+    observer.observe(document.body, { childList: true });
+    return observer;
+  }
+  function on(selector, eventTypeOrHandler, handler) {
+    if (isString(eventTypeOrHandler)) {
+      return delegateEvent(selector, eventTypeOrHandler, handler);
+    }
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (!(node instanceof HTMLElement))
+            continue;
+          if (!node.matches(selector))
+            continue;
+          eventTypeOrHandler(node);
+        }
+      }
+    });
+    for (const node of document.querySelectorAll(selector)) {
+      eventTypeOrHandler(node);
+    }
+    return observer;
   }
 
   // node_modules/book-of-spells/src/regex.mjs
@@ -500,11 +550,8 @@
           }
         });
       }
-      document.addEventListener("click", (e) => {
-        let target = e.target;
-        if (!target.matches('[target^="_modal"]:not([disabled])'))
-          target = target.closest('[target^="_modal"]:not([disabled])');
-        if (!target)
+      on('[target^="_modal"]', "click", (e, target) => {
+        if (!target || target.matches("[disabled]"))
           return;
         const targetQuery = target.getAttribute("target").replace("_modal:", "");
         const targetQueryParts = targetQuery.split(":");
