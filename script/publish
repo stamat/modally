@@ -1,0 +1,75 @@
+#!/usr/bin/env node
+const readline = require('readline')
+const { exec } = require('child_process')
+const fs = require('fs')
+const path = require('path')
+const semver = require('semver')
+let version = process.argv[2]
+
+const packageJson = require(path.join(process.cwd(), './package.json'))
+
+if (!packageJson.version) {
+  console.log('No version found in package.json')
+  return
+}
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+})
+
+if (version && !semver.valid(version)) {
+  console.log('Invalid version: ', version)
+  console.log('Current version: ', packageJson.version)
+  return
+}
+
+if (version && packageJson.version === version) {
+  console.log('Version is already set to ', version)
+  return
+}
+
+if (!version) {
+  console.log('Current version: ', packageJson.version)
+  version = semver.inc(packageJson.version, 'patch')
+  rl.question(`Fo you want to increment the version to ${version}? (y/n) `, (answer) => {
+    if (answer === 'y') {
+      publish(version)
+    } else {
+      console.log('Aborted')
+    }
+    rl.close()
+  })
+
+  return
+} else {
+  publish(version)
+}
+
+function execCallback(err, stdout, stderr) {
+  if (err) {
+    console.error(err)
+    return
+  }
+  console.log(stdout)
+  console.log(stderr)
+}
+
+function run(cmd) {
+  console.log(cmd)
+  exec(cmd, execCallback)
+}
+
+function publish(version) {
+  packageJson.version = version
+  fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2))
+
+  run('git add package.json')
+  run(`git commit -m "Bump version to ${version}"`)
+  run(`git tag v${version}`)
+  run('git push')
+  run(`git push --tags`)
+  run ('npm publish')
+}
+
+
