@@ -46,6 +46,7 @@ export class Modal {
       image: false,
       video: false,
       autoplay: true,
+      scrollToTop: true,
       template: `
         <div class="modally-wrap">
           <div class="modally-table">
@@ -221,6 +222,8 @@ export class Modal {
       
     fadeIn(this.template, () => {
       if (isFunction(callback)) callback(this)
+    }, (elem) => {
+      if (this.options.scrollToTop) elem.scrollTop = 0
     })
   }
 

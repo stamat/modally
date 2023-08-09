@@ -298,7 +298,7 @@
     element.dataset[dataPropName] = transitionDurations[property].toString();
     return transitionDurations[property];
   }
-  function fadeIn(element, callback) {
+  function fadeIn(element, callback, transitionStartCallback) {
     if (!element)
       return;
     clearTransitionTimer(element, "opacity");
@@ -318,13 +318,15 @@
       element.style.opacity = 1;
       element.style.visibility = "visible";
       element.style.removeProperty("pointer-events");
+      if (isFunction(transitionStartCallback))
+        transitionStartCallback(element);
     }, 10);
     setTransitionTimer(element, "opacity", duration, (element2) => {
       if (isFunction(callback))
         callback(element2);
     });
   }
-  function fadeOut(element, callback) {
+  function fadeOut(element, callback, transitionStartCallback) {
     if (!element)
       return;
     clearTransitionTimer(element, "opacity");
@@ -334,6 +336,8 @@
     setTimeout(() => {
       element.style.opacity = 0;
       element.style.pointerEvents = "none";
+      if (isFunction(transitionStartCallback))
+        transitionStartCallback(element);
     }, 10);
     setTransitionTimer(element, "opacity", duration, (element2) => {
       element2.style.display = "none";
@@ -364,6 +368,7 @@
         image: false,
         video: false,
         autoplay: true,
+        scrollToTop: true,
         template: `
         <div class="modally-wrap">
           <div class="modally-table">
@@ -509,6 +514,9 @@
       fadeIn(this.template, () => {
         if (isFunction(callback))
           callback(this);
+      }, (elem) => {
+        if (this.options.scrollToTop)
+          elem.scrollTop = 0;
       });
     }
     close(dataset, callback) {

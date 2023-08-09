@@ -1,3 +1,3 @@
 #!/bin/bash
 
-npx 💩 -b -c 💩.json
+npx 💩 -b "$@"
