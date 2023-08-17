@@ -201,12 +201,14 @@ export class Modal {
     if (iframe) iframe.remove()
   }
 
-  mountImage(link) {
+  mountImage(link, width, height) {
     const img = this.template.querySelector('.modally-content img')
     if (!img) return
     img.setAttribute('src', link)
     img.style.display = 'block'
     img.removeAttribute('hidden')
+    if (width) img.setAttribute('width', width)
+    if (height) img.setAttribute('height', height)
   } 
 
   open(dataset, callback) {
@@ -215,7 +217,7 @@ export class Modal {
     }
 
     if (this.options.image && dataset && dataset.hasOwnProperty('image')) {
-      this.mountImage(dataset.image)
+      this.mountImage(dataset.image, dataset.width, dataset.height)
     }
 
     document.body.classList.add(`modally-${this.id}`)
