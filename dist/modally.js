@@ -164,7 +164,7 @@
         handler(e, e.currentTarget);
       });
     }
-    observer.observe(document.body, { childList: true });
+    observer.observe(document.body, { childList: true, subtree: true });
     return observer;
   }
   function on(selector, eventTypeOrHandler, handler) {
@@ -185,6 +185,7 @@
     for (const node of document.querySelectorAll(selector)) {
       eventTypeOrHandler(node);
     }
+    observer.observe(document.body, { childList: true, subtree: true });
     return observer;
   }
 
@@ -495,20 +496,24 @@
       if (iframe)
         iframe.remove();
     }
-    mountImage(link) {
+    mountImage(link, width, height) {
       const img = this.template.querySelector(".modally-content img");
       if (!img)
         return;
       img.setAttribute("src", link);
       img.style.display = "block";
       img.removeAttribute("hidden");
+      if (width)
+        img.setAttribute("width", width);
+      if (height)
+        img.setAttribute("height", height);
     }
     open(dataset, callback) {
       if (this.options.video && dataset && dataset.hasOwnProperty("video")) {
         this.mountVideo(dataset.video);
       }
       if (this.options.image && dataset && dataset.hasOwnProperty("image")) {
-        this.mountImage(dataset.image);
+        this.mountImage(dataset.image, dataset.width, dataset.height);
       }
       document.body.classList.add(`modally-${this.id}`);
       fadeIn(this.template, () => {
