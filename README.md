@@ -8,7 +8,7 @@ I created this web modal dialog library as a repo cause I wrote the same code fo
 
 But regardless, **life is short - make reusable code!**
 
-[DEMO HERE ⤻](http://stamat.github.io/jquery.modally/)
+[DEMO HERE ⤻](http://stamat.github.io/modally/)
 
 ![Imgur](https://imgur.com/Zzg3FDx.png)
 
@@ -131,7 +131,7 @@ Event | Element/s | Description
 - [x] ~~Target element modal template injection~~
 - [x] ~~CSS animations~~
 - [ ] Accessibility W3 aria #1
-- [x] ~~Image lightbox ability~~
+- [ ] ~~Image lightbox ability~~
 - [ ] iframe in modal automation
 - [ ] responsive properties change - needs deep extend ??? (I can't remember what I meant here)
 - [x] ~~Modal manager class - refactoring bulky code~~
