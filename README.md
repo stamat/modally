@@ -133,7 +133,7 @@ Event | Element/s | Description
 - [ ] Accessibility W3 aria #1
 - [ ] ~~Image lightbox ability~~
 - [ ] iframe in modal automation
-- [ ] responsive properties change - needs deep extend ??? (I can't remember what I meant here)
+- [ ] responsive properties change - needs deep extend ??? (I can't remember what I meant here) Maybe something like the slick slider and it's responsive properties?
 - [x] ~~Modal manager class - refactoring bulky code~~
 
 ## Tested with :heart:
