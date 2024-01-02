@@ -76,7 +76,7 @@ export class Modal {
 
     shallowMerge(this.options, options)
 
-    this.template = parseDOM(this.options.template)
+    this.template = this.options.template instanceof Element || this.options.template instanceof NodeList ? this.options.template : parseDOM(this.options.template)
 
     if (this.element) {
       for (const k in this.options) {
