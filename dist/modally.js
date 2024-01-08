@@ -1,4 +1,4 @@
-/* modally v1.1.5 | undefined | MIT License */
+/* modally v1.1.6 | undefined | MIT License */
 (() => {
   // node_modules/book-of-spells/src/helpers.mjs
   function shallowMerge(target, source) {
