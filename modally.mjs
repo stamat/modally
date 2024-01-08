@@ -94,7 +94,7 @@ export class Modal {
     const modallyElement = this.template.querySelector('.modally')
     if (modallyElement) {
       css(modallyElement, {
-        'maxWidth': this.options.maxWidth
+        'maxWidth': `${this.options.maxWidth}px`
       })
     }
 

@@ -192,7 +192,7 @@
   // node_modules/book-of-spells/src/regex.mjs
   var RE_YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
   var RE_VIMEO = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
-  var RE_VIDEO = /(.*\/[^\/]+\.mp4|ogg|ogv|ogm|webm|avi)\s?$/i;
+  var RE_VIDEO = /\/([^\/]+\.(?:mp4|ogg|ogv|ogm|webm|avi))\s*$/i;
   var RE_URL_PARAMETER = /([^\s=&]+)=?([^&\s]+)?/;
 
   // node_modules/book-of-spells/src/parsers.mjs
@@ -306,7 +306,7 @@
     const styles = getComputedStyle(element);
     const duration = setTransitionDuration(element, "opacity");
     let oldOpacity = parseInt(styles.opacity);
-    if (isNaN(oldOpacity))
+    if (Number.isNaN(oldOpacity))
       oldOpacity = 0;
     if (element.hasAttribute("hidden"))
       element.removeAttribute("hidden");
@@ -395,7 +395,7 @@
         options = tempOptions;
       }
       shallowMerge(this.options, options);
-      this.template = parseDOM(this.options.template);
+      this.template = this.options.template instanceof Element || this.options.template instanceof NodeList ? this.options.template : parseDOM(this.options.template);
       if (this.element) {
         for (const k in this.options) {
           const key = /^[a-z0-9]+$/.test(k) ? k : transformCamelCaseToDash(k);
@@ -410,7 +410,7 @@
       const modallyElement = this.template.querySelector(".modally");
       if (modallyElement) {
         css(modallyElement, {
-          "maxWidth": this.options.maxWidth
+          "maxWidth": `${this.options.maxWidth}px`
         });
       }
       const modallyCellElement = this.template.querySelector(".modally-cell");
