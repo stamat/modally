@@ -172,9 +172,12 @@ export class Modal {
   getVideoId(link) {
     for (const k in this.videoRegEx) {
       const match = link.match(this.videoRegEx[k])
-      if (match) return {
-        type: k.toLowerCase(),
-        id: match[1]
+      if (match) {
+        const type = k.toLowerCase()
+        return {
+          type: type,
+          id: type === 'video' ? link : match[1]
+        }
       }
       this.videoRegEx[k].lastIndex = 0
     }

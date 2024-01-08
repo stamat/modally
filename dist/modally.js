@@ -470,11 +470,13 @@
     getVideoId(link) {
       for (const k in this.videoRegEx) {
         const match = link.match(this.videoRegEx[k]);
-        if (match)
+        if (match) {
+          const type = k.toLowerCase();
           return {
-            type: k.toLowerCase(),
-            id: match[1]
+            type,
+            id: type === "video" ? link : match[1]
           };
+        }
         this.videoRegEx[k].lastIndex = 0;
       }
       return false;
