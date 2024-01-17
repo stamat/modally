@@ -282,6 +282,18 @@
                 video: true,
                 maxWidth: 800
             })
+
+            document.addEventListener('modally:close:video-modal', function(e) {
+                console.log('video-modal opened', e, e.detail.target)
+            })
+
+            document.addEventListener('modally:close:ipsum', function(e) {
+                console.log('video-modal opened', e, e.detail.target)
+            })
+
+            document.addEventListener('modally:close:dolor', function(e) {
+                console.log('video-modal opened', e, e.detail.target)
+            })
         </script>
         <!-- Place this tag in your head or just before your close body tag. -->
         <script async defer src="https://buttons.github.io/buttons.js"></script>

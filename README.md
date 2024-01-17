@@ -74,8 +74,9 @@ modally.add('your-video-modal', {video: true});
 const modally = new Modally();
 modally.add('advanced-example');
 
-document.addEventListener('modally:opening:advanced-example', function(e) {
-	console.log(e.detail);
+document.addEventListener('modally:open:advanced-example', function(e) {
+	console.log(e.detail); // Modal instance, contains template, target, element (if any), options, etc.
+	console.log(e.detail.target); // Target element, the one that triggered the modal open. If it exists that is, otherwise it is undefined. So in the case of this example it will be the <a> element with href="#advanced-example"
 	e.detail.template.querySelector('.modally-content').innerHTML = 'Hello world!';
 });
 ```
@@ -115,11 +116,11 @@ Property | Default | Accepts | Description
 
 Event | Element/s | Description
 ----- | --------- | -----------
-**modally:init** | |
-**modally:open** | |
-**modally:opened** | |
-**modally:close** | |
-**modally:closed** | |
+**modally:added** | | modal was created
+**modally:open** | | modal is being opening
+**modally:opened** | | modal is opened
+**modally:close** | | modal is being closed
+**modally:closed** | | modal is closed
 
 ## //TODO:
 
