@@ -1,6 +1,6 @@
 {
   "name": "modally",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Simple ES6 nested modals",
   "main": "modally.mjs",
   "style": "modally.scss",
