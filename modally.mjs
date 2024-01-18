@@ -110,10 +110,6 @@ export class Modal {
 
     // Setup modal types
 
-    // TODO: maybe image lightbox - you have the old code you did for a mexican guy in 2012
-    // TODO: responsive triggers (needs deep extend) ???
-    // TODO: iframe modal
-
     if (this.options.video) this.setupVideoLanding()
     else if (this.options.image) this.setupImageLanding()
     else {
@@ -276,7 +272,7 @@ export class Modally {
           // TODO: what if the selector is not only one class, but an attribute? Maybe we don't need to remove anything?
           const className = this.options.selector.replace('.', '')
           el.classList.remove(className)
-          this.add(el.getAttribute('id'), { element: el })
+          this.add(el.getAttribute('id'), { ...this.options, element: el })
         }
       })
     }
@@ -323,24 +319,24 @@ export class Modally {
 
   add(id, options) {
     if (!id) return
+    if (!options) options = {}
 
     let element
-    if (id instanceof HTMLElement) {
-      element = id
-      id = id.getAttribute('id')
+    if (!options.element) {
+      if (id instanceof HTMLElement) {
+        element = id
+        id = id.getAttribute('id')
+      } else {
+        element = document.getElementById(id)
+      }
     } else {
-      element = document.getElementById(id)
+      element = options.element
+      delete options.element
     }
     
-    if (!options) options = {}
     if (!element && options.selector) {
       element = isString(options.selector) ? document.querySelector(options.selector) : options.selector
       delete options.selector
-    }
-    
-    if (!element && options.element) {
-      element = options.element
-      delete options.element
     }
 
     this.index[id] = new Modal(id, element, options, this)
@@ -360,12 +356,15 @@ export class Modally {
     if (modal.options.closeParent) this.close()
     if (modal.options.closeOthers) [...this.opened].forEach((modal) => this.close(modal))
 
+    console.log(modal.options.closeOthers)
+
     modal.dispatchEvents('open', target)
 
     if (!this.opened.length && this.options.disableScroll) disableScroll(this.scrollbarWidth)
     if (!this.opened.length) document.body.classList.add('modally-open')
 
     this.opened.push(modal)
+    
     css(modal.template, {
       'zIndex': modal.zIndex + this.opened.length
     })
@@ -381,6 +380,7 @@ export class Modally {
     }
 
     const modal = id instanceof Modal ? id : this.get(id)
+
     if (!modal) return
     this.opened.pop()
 

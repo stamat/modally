@@ -13,7 +13,7 @@ if (window.hasOwnProperty("jQuery") || window.hasOwnProperty("$")) {
           selector: ".modally-init",
         });
       }
-
+      
       return this.each(function () {
         options.element = this;
         window.jQueryModally.add(this, options);

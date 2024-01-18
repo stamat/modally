@@ -564,7 +564,7 @@
           if (el.hasAttribute("id")) {
             const className = this.options.selector.replace(".", "");
             el.classList.remove(className);
-            this.add(el.getAttribute("id"), { element: el });
+            this.add(el.getAttribute("id"), { ...this.options, element: el });
           }
         });
       }
@@ -606,22 +606,23 @@
     add(id, options) {
       if (!id)
         return;
-      let element;
-      if (id instanceof HTMLElement) {
-        element = id;
-        id = id.getAttribute("id");
-      } else {
-        element = document.getElementById(id);
-      }
       if (!options)
         options = {};
+      let element;
+      if (!options.element) {
+        if (id instanceof HTMLElement) {
+          element = id;
+          id = id.getAttribute("id");
+        } else {
+          element = document.getElementById(id);
+        }
+      } else {
+        element = options.element;
+        delete options.element;
+      }
       if (!element && options.selector) {
         element = isString(options.selector) ? document.querySelector(options.selector) : options.selector;
         delete options.selector;
-      }
-      if (!element && options.element) {
-        element = options.element;
-        delete options.element;
       }
       this.index[id] = new Modal(id, element, options, this);
       this.index[id].dispatchEvents("added");
@@ -638,6 +639,7 @@
         this.close();
       if (modal.options.closeOthers)
         [...this.opened].forEach((modal2) => this.close(modal2));
+      console.log(modal.options.closeOthers);
       modal.dispatchEvents("open", target);
       if (!this.opened.length && this.options.disableScroll)
         disableScroll(this.scrollbarWidth);
