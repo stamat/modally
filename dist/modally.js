@@ -360,7 +360,7 @@
       this.videoRegEx.VIMEO = RE_VIMEO;
       this.videoRegEx.VIDEO = RE_VIDEO;
       this.options = {
-        landing: "body",
+        landing: document.body,
         maxWidth: "none",
         classes: "",
         verticalAlign: "middle",

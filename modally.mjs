@@ -37,7 +37,7 @@ export class Modal {
     //TODO: automatic video modal detection
 
     this.options = {
-      landing: 'body',
+      landing: document.body,
       maxWidth: 'none',
       classes: '',
       verticalAlign: 'middle',
