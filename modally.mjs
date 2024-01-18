@@ -53,7 +53,7 @@ export class Modal {
             <div class="modally-cell">
               <div class="modally-underlay modally-close"></div>
               <div class="modally" role="dialog" aria-modal="true">
-                <button tabindex="1" class="modally-close modally-close-button">&times;</button>
+                <button tabindex="1" class="modally-close modally-close-button" aria-label="Close">&times;</button>
                 <div class="modally-content"></div>
               </div>
             </div>
