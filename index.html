@@ -231,6 +231,8 @@
               <a href="#lorem" target="_modal" class="button white" style="margin-right: 6px;">Try me!</a>
               <a href="#video-modal" target="_modal" data-video="https://www.youtube.com/watch?v=u9QJo5fBADE" style="margin-left: 6px;" class="button hollow">Video?</a>
               <a href="#video-modal" target="_modal" data-video="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" style="margin-left: 6px;" class="button hollow">Real Video?</a>
+              <a href="#image-modal" target="_modal" data-image="//upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg" data-width="800" data-height="1192" style="margin-left: 6px;" class="button hollow">Image?</a>
+
               <div class="github-buttons">
                 <a class="github-button" href="https://github.com/stamat/jquery.modally" data-size="large" aria-label="Download stamat/jquery.modally on GitHub">View on GitHub</a>
               </div>
@@ -283,6 +285,11 @@
 
       modally.add('video-modal', {
         video: true,
+        maxWidth: 800
+      })
+
+      modally.add('image-modal', {
+        image: true,
         maxWidth: 800
       })
     </script>
