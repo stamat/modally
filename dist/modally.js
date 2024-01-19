@@ -555,7 +555,9 @@
       this.index = {};
       this.opened = [];
       this.options = {
-        disableScroll: true
+        disableScroll: true,
+        enableHashCheck: true,
+        closeOthersOnHashChange: false
       };
       this.scrollbarWidth = getScrollbarWidth();
       if (options)
@@ -596,13 +598,25 @@
           this.close();
         }
       });
+      if (this.options.enableHashCheck)
+        this.initHashCheck();
     }
     modallyHashCheck(hash) {
       const hashProperties = getHashProperties(hash);
       for (const id in hashProperties) {
         if (hashProperties[id] === void 0 && this.index.hasOwnProperty(id)) {
+          if (this.options.closeOthersOnHashChange)
+            this.close();
           this.open(id, hashProperties);
         }
+      }
+    }
+    modallyInitialHashCheck(id) {
+      const hashProperties = getHashProperties();
+      if (hashProperties.hasOwnProperty(id)) {
+        if (this.options.closeOthersOnHashChange)
+          this.close();
+        this.open(id, hashProperties);
       }
     }
     add(id, options) {
@@ -628,7 +642,8 @@
       }
       this.index[id] = new Modal(id, element, options, this);
       this.index[id].dispatchEvents("added");
-      this.initHashCheck();
+      if (this.options.enableHashCheck)
+        this.modallyInitialHashCheck(id);
     }
     get(id) {
       return this.index[id];
@@ -641,7 +656,6 @@
         this.close();
       if (modal.options.closeOthers)
         [...this.opened].forEach((modal2) => this.close(modal2));
-      console.log(modal.options.closeOthers);
       modal.dispatchEvents("open", target);
       if (!this.opened.length && this.options.disableScroll)
         disableScroll(this.scrollbarWidth);
@@ -672,7 +686,6 @@
         modal.dispatchEvents("closed", target);
       });
     }
-    // Only after registering all modals
     initHashCheck() {
       hashChange((hash) => {
         this.modallyHashCheck(hash);

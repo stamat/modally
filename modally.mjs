@@ -260,6 +260,8 @@ export class Modally {
     this.opened = []
     this.options = {
       disableScroll: true,
+      enableHashCheck: true,
+      closeOthersOnHashChange: false,
     }
 
     this.scrollbarWidth = getScrollbarWidth()
@@ -306,6 +308,8 @@ export class Modally {
         this.close()
       }
     })
+
+    if (this.options.enableHashCheck) this.initHashCheck()
   }
 
   modallyHashCheck(hash) {
@@ -313,8 +317,17 @@ export class Modally {
 
     for (const id in hashProperties) {
       if (hashProperties[id] === undefined && this.index.hasOwnProperty(id)) {
+        if (this.options.closeOthersOnHashChange) this.close()
         this.open(id, hashProperties)
       }
+    }
+  }
+
+  modallyInitialHashCheck(id) {
+    const hashProperties = getHashProperties()
+    if (hashProperties.hasOwnProperty(id)) {
+      if (this.options.closeOthersOnHashChange) this.close()
+      this.open(id, hashProperties)
     }
   }
 
@@ -343,7 +356,7 @@ export class Modally {
     this.index[id] = new Modal(id, element, options, this)
     this.index[id].dispatchEvents('added')
 
-    this.initHashCheck()
+    if (this.options.enableHashCheck) this.modallyInitialHashCheck(id)
   }
 
   get(id) {
@@ -356,8 +369,6 @@ export class Modally {
 
     if (modal.options.closeParent) this.close()
     if (modal.options.closeOthers) [...this.opened].forEach((modal) => this.close(modal))
-
-    console.log(modal.options.closeOthers)
 
     modal.dispatchEvents('open', target)
 
@@ -395,7 +406,6 @@ export class Modally {
     })
   }
 
-  // Only after registering all modals
   initHashCheck() {
     hashChange((hash) => {
       this.modallyHashCheck(hash)

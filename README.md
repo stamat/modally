@@ -23,15 +23,22 @@ I created this web modal dialog library as a repo cause I wrote the same code fo
 * **Video embeddable** - automatic Vimeo, Youtube and HTML Video embeds with autoplay
 * **Image lightbox** - automatic image lightbox
 * **ESC closable**
+* **Hash change detection** - automatic modal open on hash change
 * **Infinitely customizable** - go f**king wild 🎉
 * **Framework agnostic** - no dependencies, fully native! You can use it with jQuery if you want to, `$(selector).modally(options)` a plugin is available if jQuery is present if you use this library as an IIFE script.
 
 ## Installation
 
-### NPM or Yarn
+### NPM
 
 ```bash
 npm i modally
+```
+
+### Yarn
+
+```bash
+yarn add modally
 ```
 
 Use it as a module
@@ -57,6 +64,9 @@ import Modally from 'https://unpkg.com/modally';
 ## Usage
 
 Modally works with IDs. You need to apply a unique ID to each modal. If you are creating a modal from an existing element, it's ID will be used. If you are creating a modal with dynamic content (advanced usage), you need to provide an ID.
+
+// TODO: OPENING AND CLOSING MODALS target="_modal:open:modal-id" target="_modal:close:modal-id" explained
+// TODO: explain Modally class and the indexing of modals
 
 ### Quick Start
 
@@ -121,11 +131,15 @@ document.addEventListener('modally:open:advanced-example', function(e) {
 Property | Default | Accepts | Description
 -------- | ------- | ------- | -----------
 **landing** | `document.body` | string selector or element | where to append the modal window
+**disableScroll** | true | boolean | Whether to disable scrolling on the body when modal is open
+**scrollToTop** | true | boolean | Whether to scroll to top modal content upon opening a modal
 **maxWidth** | 'none' | 'none' or number | Defines maximum width of the modal window, just like max-width css property
 **classes** | '' | string | Additional classes to add to the modal window
 **verticalAlign** | 'middle' | 'middle' or 'top' or 'bottom' | Vertical orientation of the modal window, like vertical-align css property
 **closeParent** | false | boolean | Whether to close the parent modal window, parent window is automatically selected if a modal open is triggered within another modal
 **closeOthers** | false | boolean | Wether to close all other opened modals upon opening this modal
+**enableHashChange** | true | boolean | Whether to open a modal on hash change
+**closeOthersOnHashChange** | false | boolean | Whether to close all other opened modals upon opening a modal on hash change
 **video** | false | boolean | For creating a video modal
 **image** | false | boolean | For creating an image "lightbox" modal
 **autoplay** | true | boolean | Whether video modal should autoplay
