@@ -5,6 +5,7 @@
     for (const key in source) {
       target[key] = source[key];
     }
+    return target;
   }
   function isEmptyObject(o) {
     for (const i in o) {
@@ -88,6 +89,39 @@
     return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
   }
 
+  // node_modules/book-of-spells/src/regex.mjs
+  var RE_YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+  var RE_VIMEO = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
+  var RE_VIDEO = /\/([^\/]+\.(?:mp4|ogg|ogv|ogm|webm|avi))\s*$/i;
+  var RE_URL_PARAMETER = /([^\s=&]+)=?([^&\s]+)?/;
+
+  // node_modules/book-of-spells/src/parsers.mjs
+  function parseUrlParameters(paramString, decode = true) {
+    const res = {};
+    const paramParts = paramString.split("&");
+    paramParts.forEach((part) => {
+      const m = part.match(RE_URL_PARAMETER);
+      if (!m)
+        return;
+      const key = m[1];
+      const value = m[2];
+      res[key] = value !== void 0 && decode ? stringToType(decodeURIComponent(value)) : stringToType(value);
+      RE_URL_PARAMETER.lastIndex = 0;
+    });
+    return res;
+  }
+  function serializeUrlParameters(obj, encode = true) {
+    const res = [];
+    Object.keys(obj).forEach((key) => {
+      const value = obj[key];
+      if (value === void 0)
+        return res.push(key);
+      const encodedValue = encode ? encodeURIComponent(value) : value;
+      res.push(`${key}=${encodedValue}`);
+    });
+    return res.join("&");
+  }
+
   // node_modules/book-of-spells/src/dom.mjs
   function css(element, styles, transform = false) {
     if (!element || !styles)
@@ -133,6 +167,8 @@
     return element;
   }
   function parseDOM(html, allChildren) {
+    if (html instanceof Element || html instanceof NodeList)
+      return html;
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     return !allChildren ? doc.body.firstChild : doc.body.childNodes;
@@ -187,26 +223,6 @@
     }
     observer.observe(document.body, { childList: true, subtree: true });
     return observer;
-  }
-
-  // node_modules/book-of-spells/src/regex.mjs
-  var RE_YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
-  var RE_VIMEO = /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i;
-  var RE_VIDEO = /\/([^\/]+\.(?:mp4|ogg|ogv|ogm|webm|avi))\s*$/i;
-  var RE_URL_PARAMETER = /([^\s=&]+)=?([^&\s]+)?/;
-
-  // node_modules/book-of-spells/src/parsers.mjs
-  function parseUrlParameters(paramString, decode = true) {
-    const res = {};
-    const paramParts = paramString.split("&");
-    paramParts.forEach((part) => {
-      const m = part.match(RE_URL_PARAMETER);
-      const key = m[1];
-      const value = m[2];
-      res[key] = value !== void 0 && decode ? stringToType(decodeURIComponent(value)) : value;
-      RE_URL_PARAMETER.lastIndex = 0;
-    });
-    return res;
   }
 
   // node_modules/book-of-spells/src/browser.mjs
@@ -355,17 +371,21 @@
       this.id = id;
       this.element = contentElement;
       this.modallyInstance = modallyInstance;
+      this.opened = false;
       this.videoRegEx = {};
       this.videoRegEx.YOUTUBE = RE_YOUTUBE;
       this.videoRegEx.VIMEO = RE_VIMEO;
       this.videoRegEx.VIDEO = RE_VIDEO;
       this.options = {
+        disableScroll: true,
         landing: document.body,
         maxWidth: "none",
         classes: "",
         verticalAlign: "middle",
         closeParent: false,
         closeOthers: false,
+        enableHashChange: true,
+        closeOthersOnHashChange: false,
         image: false,
         video: false,
         autoplay: true,
@@ -513,6 +533,9 @@
         img.setAttribute("height", height);
     }
     open(target, callback) {
+      if (this.opened)
+        return;
+      this.opened = true;
       const dataset = target instanceof HTMLElement ? target.dataset : target;
       if (this.options.video && dataset && dataset.hasOwnProperty("video")) {
         this.mountVideo(dataset.video);
@@ -528,8 +551,12 @@
         if (this.options.scrollToTop)
           elem.scrollTop = 0;
       });
+      return true;
     }
     close(target, callback) {
+      if (!this.opened)
+        return;
+      this.opened = false;
       fadeOut(this.template, () => {
         if (this.options.video)
           this.unmountVideo();
@@ -540,6 +567,7 @@
           "zIndex": this.zIndex
         });
       });
+      return true;
     }
     dispatchEvents(eventName, target) {
       this.target = target;
@@ -555,9 +583,7 @@
       this.index = {};
       this.opened = [];
       this.options = {
-        disableScroll: true,
-        enableHashCheck: true,
-        closeOthersOnHashChange: false
+        selector: null
       };
       this.scrollbarWidth = getScrollbarWidth();
       if (options)
@@ -568,7 +594,9 @@
           if (el.hasAttribute("id")) {
             const className = this.options.selector.replace(".", "");
             el.classList.remove(className);
-            this.add(el.getAttribute("id"), { ...this.options, element: el });
+            const options2 = { ...this.options, element: el };
+            delete options2.selector;
+            this.add(el.getAttribute("id"), options2);
           }
         });
       }
@@ -579,10 +607,23 @@
         const targetQueryParts = targetQuery.split(":");
         const href = target.getAttribute("href");
         let id, modal;
+        function pickProperties(obj, props) {
+          const res = {};
+          for (let i = 0; i < props.length; i++) {
+            if (obj.hasOwnProperty(props[i]))
+              res[props[i]] = obj[props[i]];
+          }
+          return res;
+        }
         if (href && href.length && href !== "#") {
           e.preventDefault();
           id = href.replace("#", "");
           modal = this.get(id);
+          if (modal.options.updateHash) {
+            const getAttributes = pickProperties(target.dataset, ["image", "video", "width", "height", "srcset"]);
+            const hash = serializeUrlParameters(getAttributes);
+            window.location.hash = `#${id}${hash.length ? `&${hash}` : ""}`;
+          }
         }
         if (targetQueryParts.length > 1) {
           id = targetQueryParts[1];
@@ -598,32 +639,45 @@
           this.close();
         }
       });
-      if (this.options.enableHashCheck)
-        this.initHashCheck();
+      this.initHashCheck();
     }
     modallyHashCheck(hash) {
       const hashProperties = getHashProperties(hash);
       for (const id in hashProperties) {
-        if (hashProperties[id] === void 0 && this.index.hasOwnProperty(id)) {
-          if (this.options.closeOthersOnHashChange)
-            this.close();
+        if (hashProperties[id] !== void 0)
+          continue;
+        const modal = this.get(id);
+        if (!modal)
+          continue;
+        if (modal.options.closeOthersOnHashChange)
+          this.closeAll();
+        if (modal.options.enableHashChange)
           this.open(id, hashProperties);
-        }
       }
     }
     modallyInitialHashCheck(id) {
+      if (this.options.closeOthersOnHashChange)
+        this.closeAll();
       const hashProperties = getHashProperties();
-      if (hashProperties.hasOwnProperty(id)) {
-        if (this.options.closeOthersOnHashChange)
-          this.close();
+      if (!hashProperties.hasOwnProperty(id))
+        return;
+      const modal = this.get(id);
+      if (!modal)
+        return;
+      if (modal.options.closeOthersOnHashChange)
+        this.closeAll();
+      if (modal.options.enableHashChange)
         this.open(id, hashProperties);
-      }
     }
     add(id, options) {
       if (!id)
         return;
       if (!options)
         options = {};
+      const optionsClone = { ...this.options };
+      delete optionsClone.selector;
+      shallowMerge(optionsClone, options);
+      options = optionsClone;
       let element;
       if (!options.element) {
         if (id instanceof HTMLElement) {
@@ -640,13 +694,17 @@
         element = isString(options.selector) ? document.querySelector(options.selector) : options.selector;
         delete options.selector;
       }
-      this.index[id] = new Modal(id, element, options, this);
-      this.index[id].dispatchEvents("added");
-      if (this.options.enableHashCheck)
+      const modal = new Modal(id, element, options, this);
+      this.index[id] = modal;
+      modal.dispatchEvents("added");
+      if (modal.options.enableHashChange)
         this.modallyInitialHashCheck(id);
     }
     get(id) {
       return this.index[id];
+    }
+    isOpen(id) {
+      return this.get(id).opened;
     }
     open(id, target) {
       const modal = id instanceof Modal ? id : this.get(id);
@@ -655,19 +713,23 @@
       if (modal.options.closeParent)
         this.close();
       if (modal.options.closeOthers)
-        [...this.opened].forEach((modal2) => this.close(modal2));
+        this.closeAll();
+      if (modal.opened)
+        return;
       modal.dispatchEvents("open", target);
-      if (!this.opened.length && this.options.disableScroll)
+      if (!this.opened.length && modal.options.disableScroll)
         disableScroll(this.scrollbarWidth);
       if (!this.opened.length)
         document.body.classList.add("modally-open");
-      this.opened.push(modal);
       css(modal.template, {
         "zIndex": modal.zIndex + this.opened.length
       });
-      modal.open(target, () => {
+      const isOpened = modal.open(target, () => {
         modal.dispatchEvents("opened", target);
       });
+      if (!isOpened)
+        return;
+      this.opened.push(modal);
     }
     close(id, target) {
       if (!id && this.opened.length) {
@@ -676,15 +738,20 @@
       const modal = id instanceof Modal ? id : this.get(id);
       if (!modal)
         return;
-      this.opened.pop();
-      modal.dispatchEvents("close", target);
-      modal.close(target, () => {
-        if (!this.opened.length && this.options.disableScroll)
+      const isClosed = modal.close(target, () => {
+        if (!this.opened.length && modal.options.disableScroll)
           enableScroll(this.scrollbarWidth);
         if (!this.opened.length)
           document.body.classList.remove("modally-open");
         modal.dispatchEvents("closed", target);
       });
+      if (!isClosed)
+        return;
+      this.opened.pop();
+      modal.dispatchEvents("close", target);
+    }
+    closeAll() {
+      [...this.opened].forEach((modal) => this.close(modal));
     }
     initHashCheck() {
       hashChange((hash) => {

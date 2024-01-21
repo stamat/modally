@@ -16,6 +16,8 @@ import {
   isFunction, 
   transformDashToCamelCase,
   transformCamelCaseToDash,
+  serializeUrlParameters,
+  pickProperties,
   RE_VIDEO, 
   RE_YOUTUBE, 
   RE_VIMEO,
@@ -27,6 +29,7 @@ export class Modal {
     this.id = id
     this.element = contentElement
     this.modallyInstance = modallyInstance
+    this.opened = false
 
     // https://www.youtube.com/watch?v=gJ-WmYn_9GE
     this.videoRegEx = {};
@@ -37,12 +40,16 @@ export class Modal {
     //TODO: automatic video modal detection
 
     this.options = {
+      disableScroll: true,
       landing: document.body,
       maxWidth: 'none',
       classes: '',
       verticalAlign: 'middle',
       closeParent: false,
       closeOthers: false,
+      enableHashChange: true,
+      closeOthersOnHashChange: false,
+      updateHash: false,
       image: false,
       video: false,
       autoplay: true,
@@ -108,8 +115,7 @@ export class Modal {
     if (!isEmpty(this.options.classes))
       this.template.classList.add(this.options.classes)
 
-    // Setup modal types
-
+    // Setup modal types. There are 3 types: video, image and default (no type).
     if (this.options.video) this.setupVideoLanding()
     else if (this.options.image) this.setupImageLanding()
     else {
@@ -131,7 +137,6 @@ export class Modal {
       })
     })
 
-    //this.template.classList.add(id)
     landing.appendChild(this.template)
     
     this.zIndex = window.getComputedStyle(this.template).zIndex
@@ -212,7 +217,10 @@ export class Modal {
   } 
 
   open(target, callback) {
-    const dataset = target instanceof HTMLElement ? target.dataset : target
+    if (this.opened) return
+    this.opened = true
+
+    const dataset = target instanceof HTMLElement ? target.dataset : target // target can either be an element with a dataset or a dataset object itself. This way an object can be passed from the url hash variables
 
     if (this.options.video && dataset && dataset.hasOwnProperty('video')) {
       this.mountVideo(dataset.video)
@@ -223,15 +231,19 @@ export class Modal {
     }
 
     document.body.classList.add(`modally-${this.id}`)
-      
+    
     fadeIn(this.template, () => {
       if (isFunction(callback)) callback(this)
     }, (elem) => {
       if (this.options.scrollToTop) elem.scrollTop = 0
     })
+    return true
   }
 
   close(target, callback) {
+    if (!this.opened) return
+    this.opened = false
+
     fadeOut(this.template, () => {
       if (this.options.video) this.unmountVideo()
       document.body.classList.remove(`modally-${this.id}`)
@@ -242,6 +254,7 @@ export class Modal {
         'zIndex': this.zIndex
       })
     })
+    return true
   }
 
   dispatchEvents(eventName, target) {
@@ -259,9 +272,7 @@ export class Modally {
     this.index = {}
     this.opened = []
     this.options = {
-      disableScroll: true,
-      enableHashCheck: true,
-      closeOthersOnHashChange: false,
+      selector: null
     }
 
     this.scrollbarWidth = getScrollbarWidth()
@@ -275,7 +286,9 @@ export class Modally {
           // TODO: what if the selector is not only one class, but an attribute? Maybe we don't need to remove anything?
           const className = this.options.selector.replace('.', '')
           el.classList.remove(className)
-          this.add(el.getAttribute('id'), { ...this.options, element: el })
+          const options = { ...this.options, element: el }
+          delete options.selector // TODO: use book of spells reject to remove the selector property and hash settings
+          this.add(el.getAttribute('id'), options)
         }
       })
     }
@@ -291,6 +304,12 @@ export class Modally {
         e.preventDefault()
         id = href.replace('#', '')
         modal = this.get(id)
+
+        if (modal.options.updateHash) {
+          const getAttributes = pickProperties(target.dataset, ['image', 'video', 'width', 'height', 'srcset']) // TODO: these should be defined in the modal option, one can pass the data attributes and do simple templating in the modal
+          const hash = serializeUrlParameters(getAttributes)
+          window.location.hash = `#${id}${hash.length ? `&${hash}` : ''}`
+        }
       }
       
       if (targetQueryParts.length > 1) {
@@ -309,31 +328,40 @@ export class Modally {
       }
     })
 
-    if (this.options.enableHashCheck) this.initHashCheck()
+    // TODO: This should be a setting also for the modally instance, and there should be a setting to close all modals on hash change regardless if the modal exists or not
+    this.initHashCheck()
   }
 
   modallyHashCheck(hash) {
     const hashProperties = getHashProperties(hash)
-
+    
     for (const id in hashProperties) {
-      if (hashProperties[id] === undefined && this.index.hasOwnProperty(id)) {
-        if (this.options.closeOthersOnHashChange) this.close()
-        this.open(id, hashProperties)
-      }
+      if (hashProperties[id] !== undefined) continue // skip empty value hash properties
+      const modal = this.get(id)
+      if (!modal) continue
+      if (modal.options.closeOthersOnHashChange) this.closeAll()
+      if (modal.options.enableHashChange) this.open(id, hashProperties)
     }
   }
 
   modallyInitialHashCheck(id) {
+    if (this.options.closeOthersOnHashChange) this.closeAll()
     const hashProperties = getHashProperties()
-    if (hashProperties.hasOwnProperty(id)) {
-      if (this.options.closeOthersOnHashChange) this.close()
-      this.open(id, hashProperties)
-    }
+  
+    if (!hashProperties.hasOwnProperty(id)) return
+    const modal = this.get(id)
+    if (!modal) return
+    if (modal.options.closeOthersOnHashChange) this.closeAll()
+    if (modal.options.enableHashChange) this.open(id, hashProperties)
   }
 
   add(id, options) {
     if (!id) return
     if (!options) options = {}
+    const optionsClone = {...this.options}
+    delete optionsClone.selector
+    shallowMerge(optionsClone, options)
+    options = optionsClone
 
     let element
     if (!options.element) {
@@ -353,14 +381,19 @@ export class Modally {
       delete options.selector
     }
 
-    this.index[id] = new Modal(id, element, options, this)
-    this.index[id].dispatchEvents('added')
+    const modal = new Modal(id, element, options, this)
+    this.index[id] = modal
+    modal.dispatchEvents('added')
 
-    if (this.options.enableHashCheck) this.modallyInitialHashCheck(id)
+    if (modal.options.enableHashChange) this.modallyInitialHashCheck(id)
   }
 
   get(id) {
     return this.index[id]
+  }
+
+  isOpen(id) {
+    return this.get(id).opened
   }
 
   open(id, target) {
@@ -368,22 +401,25 @@ export class Modally {
     if (!modal) return
 
     if (modal.options.closeParent) this.close()
-    if (modal.options.closeOthers) [...this.opened].forEach((modal) => this.close(modal))
+    if (modal.options.closeOthers) this.closeAll()
 
+    if (modal.opened) return
     modal.dispatchEvents('open', target)
 
-    if (!this.opened.length && this.options.disableScroll) disableScroll(this.scrollbarWidth)
+    if (!this.opened.length && modal.options.disableScroll) disableScroll(this.scrollbarWidth)
     if (!this.opened.length) document.body.classList.add('modally-open')
 
-    this.opened.push(modal)
-    
     css(modal.template, {
       'zIndex': modal.zIndex + this.opened.length
     })
 
-    modal.open(target, () => {
+    const isOpened = modal.open(target, () => {
       modal.dispatchEvents('opened', target)
     })
+
+    if (!isOpened) return
+
+    this.opened.push(modal)
   }
 
   close(id, target) {
@@ -392,18 +428,23 @@ export class Modally {
     }
 
     const modal = id instanceof Modal ? id : this.get(id)
-
     if (!modal) return
-    this.opened.pop()
 
-    modal.dispatchEvents('close', target)
-
-    modal.close(target, () => {
-      if (!this.opened.length && this.options.disableScroll) enableScroll(this.scrollbarWidth)
+    const isClosed = modal.close(target, () => {
+      if (!this.opened.length && modal.options.disableScroll) enableScroll(this.scrollbarWidth)
       if (!this.opened.length) document.body.classList.remove('modally-open')
 
       modal.dispatchEvents('closed', target)
     })
+    if (!isClosed) return
+
+    this.opened.pop()
+
+    modal.dispatchEvents('close', target)
+  }
+
+  closeAll() {
+    [...this.opened].forEach((modal) => this.close(modal))
   }
 
   initHashCheck() {
