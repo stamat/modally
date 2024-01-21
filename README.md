@@ -67,6 +67,7 @@ Modally works with IDs. You need to apply a unique ID to each modal. If you are 
 
 // TODO: OPENING AND CLOSING MODALS target="_modal:open:modal-id" target="_modal:close:modal-id" explained
 // TODO: explain Modally class and the indexing of modals
+// TODO: Document the `selector` option, make a distinction between modally options and modal options
 
 ### Quick Start
 
@@ -140,6 +141,7 @@ Property | Default | Accepts | Description
 **closeOthers** | false | boolean | Wether to close all other opened modals upon opening this modal
 **enableHashChange** | true | boolean | Whether to open a modal on hash change
 **closeOthersOnHashChange** | false | boolean | Whether to close all other opened modals upon opening a modal on hash change
+**updateHash** | false | boolean | Whether to update the hash when opening a modal. If set to true, the hash will be updated to the modal ID and the data attributes will be added to the hash as well in case of a video or image modal
 **video** | false | boolean | For creating a video modal
 **image** | false | boolean | For creating an image "lightbox" modal
 **autoplay** | true | boolean | Whether video modal should autoplay
