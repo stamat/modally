@@ -17,7 +17,7 @@ import {
   transformDashToCamelCase,
   transformCamelCaseToDash,
   serializeUrlParameters,
-  pickProperties,
+  pick,
   RE_VIDEO, 
   RE_YOUTUBE, 
   RE_VIMEO,
@@ -306,7 +306,7 @@ export class Modally {
         modal = this.get(id)
 
         if (modal.options.updateHash) {
-          const getAttributes = pickProperties(target.dataset, ['image', 'video', 'width', 'height', 'srcset']) // TODO: these should be defined in the modal option, one can pass the data attributes and do simple templating in the modal
+          const getAttributes = pick(target.dataset, ['image', 'video', 'width', 'height', 'srcset']) // TODO: these should be defined in the modal option, one can pass the data attributes and do simple templating in the modal
           const hash = serializeUrlParameters(getAttributes)
           window.location.hash = `#${id}${hash.length ? `&${hash}` : ''}`
         }
