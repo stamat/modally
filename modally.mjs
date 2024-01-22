@@ -36,8 +36,7 @@ export class Modal {
     this.videoRegEx.YOUTUBE = RE_YOUTUBE
     this.videoRegEx.VIMEO = RE_VIMEO
     this.videoRegEx.VIDEO = RE_VIDEO
-    //TODO: add support for brightcove and cloudfront
-    //TODO: automatic video modal detection
+    //TODO: add support for brightcove and cloudfront. or not? 
 
     this.options = {
       disableScroll: true,
@@ -286,6 +285,7 @@ export class Modally {
           // TODO: what if the selector is not only one class, but an attribute? Maybe we don't need to remove anything?
           const className = this.options.selector.replace('.', '')
           el.classList.remove(className)
+          
           const options = { ...this.options, element: el }
           delete options.selector // TODO: use book of spells reject to remove the selector property and hash settings
           this.add(el.getAttribute('id'), options)

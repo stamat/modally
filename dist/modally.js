@@ -90,11 +90,30 @@
   }
   function pickProperties(obj, props) {
     const res = {};
+    if (!props)
+      return res;
+    if (!isArray(props))
+      props = [props];
     for (let i = 0; i < props.length; i++) {
       if (obj.hasOwnProperty(props[i]))
         res[props[i]] = obj[props[i]];
     }
     return res;
+  }
+  function pickArrayElements(arr, indexes) {
+    if (!isArray(arr))
+      return;
+    if (!isArray(indexes))
+      indexes = [indexes];
+    const res = [];
+    for (let i = 0; i < indexes.length; i++) {
+      if (arr.hasOwnProperty(indexes[i]))
+        res.push(arr[indexes[i]]);
+    }
+    return res;
+  }
+  function pick(obj, props) {
+    return isObject(obj) ? pickProperties(obj, props) : pickArrayElements(obj, props);
   }
 
   // node_modules/book-of-spells/src/regex.mjs
@@ -621,7 +640,7 @@
           id = href.replace("#", "");
           modal = this.get(id);
           if (modal.options.updateHash) {
-            const getAttributes = pickProperties(target.dataset, ["image", "video", "width", "height", "srcset"]);
+            const getAttributes = pick(target.dataset, ["image", "video", "width", "height", "srcset"]);
             const hash = serializeUrlParameters(getAttributes);
             window.location.hash = `#${id}${hash.length ? `&${hash}` : ""}`;
           }
