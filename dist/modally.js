@@ -88,6 +88,14 @@
   function transformCamelCaseToDash(str) {
     return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
   }
+  function pickProperties(obj, props) {
+    const res = {};
+    for (let i = 0; i < props.length; i++) {
+      if (obj.hasOwnProperty(props[i]))
+        res[props[i]] = obj[props[i]];
+    }
+    return res;
+  }
 
   // node_modules/book-of-spells/src/regex.mjs
   var RE_YOUTUBE = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
@@ -386,6 +394,7 @@
         closeOthers: false,
         enableHashChange: true,
         closeOthersOnHashChange: false,
+        updateHash: false,
         image: false,
         video: false,
         autoplay: true,
@@ -607,14 +616,6 @@
         const targetQueryParts = targetQuery.split(":");
         const href = target.getAttribute("href");
         let id, modal;
-        function pickProperties(obj, props) {
-          const res = {};
-          for (let i = 0; i < props.length; i++) {
-            if (obj.hasOwnProperty(props[i]))
-              res[props[i]] = obj[props[i]];
-          }
-          return res;
-        }
         if (href && href.length && href !== "#") {
           e.preventDefault();
           id = href.replace("#", "");

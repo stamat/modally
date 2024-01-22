@@ -328,7 +328,7 @@ export class Modally {
       }
     })
 
-    // TODO: This should be a setting also for the modally instance, and there should be a setting to close all modals on hash change regardless if the modal exists or not
+    // TODO: This should be a setting also for the modally instance, and there should be a setting to close all modals on hash change regardless if the modal exists or not, clear the hash on modal close. If there is a parent update the hash to the has of the parent... etc...
     this.initHashCheck()
   }
 
