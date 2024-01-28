@@ -5,11 +5,8 @@
   "options": {
     "sourcemap": true,
     "minify": true,
-    "justMinified": false,
     "format": "iife",
-    "target": "es2019",
-    "mangle": true,
-    "globalName": "focusOutline"
+    "target": "es2019"
   }
   }],
   "styles": [{
