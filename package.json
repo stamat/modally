@@ -14,7 +14,9 @@
     "modal-window",
     "modal-dialogs",
     "nested",
-    "es6"
+    "es6",
+    "esm",
+    "dialog"
   ],
   "author": "Nikola Stamatovic <@stamat>",
   "contributors": [],
