@@ -82,7 +82,11 @@ export class Modal {
 
     shallowMerge(this.options, options)
 
-    this.template = this.options.template instanceof Element || this.options.template instanceof NodeList ? this.options.template : parseDOM(this.options.template)
+    this.element = this.options.template instanceof Element || this.options.template instanceof NodeList ? this.options.template : parseDOM(this.options.template)
+    /**
+     * @deprecated `template` is deprecated and will be removed in the future. Use this.element instead. Why did I name it `template`? I don't know.
+     */
+    this.template = this.element
 
     if (this.element) {
       for (const k in this.options) {
@@ -95,16 +99,16 @@ export class Modal {
       if (this.element.hasAttribute('id')) this.element.removeAttribute('id')
     }
 
-    this.template.setAttribute('id', this.id)
+    this.element.setAttribute('id', this.id)
 
-    const modallyElement = this.template.querySelector('.modally')
+    const modallyElement = this.element.querySelector('.modally')
     if (modallyElement) {
       css(modallyElement, {
         'maxWidth': `${this.options.maxWidth}px`
       })
     }
 
-    const modallyCellElement = this.template.querySelector('.modally-cell')
+    const modallyCellElement = this.element.querySelector('.modally-cell')
     if (modallyCellElement) {
       css(modallyCellElement, {
         'verticalAlign': this.options.verticalAlign
@@ -112,7 +116,7 @@ export class Modal {
     }
 
     if (!isEmpty(this.options.classes))
-      this.template.classList.add(this.options.classes)
+      this.element.classList.add(this.options.classes)
 
     // Setup modal types. There are 3 types: video, image and default (no type).
     if (this.options.video) this.setupVideoLanding()
@@ -120,7 +124,7 @@ export class Modal {
     else {
       if (this.element) {
         const ghost = detachElement(this.element)
-        this.template.querySelector('.modally-content').appendChild(ghost)
+        this.element.querySelector('.modally-content').appendChild(ghost)
       }
     }
 
@@ -129,16 +133,16 @@ export class Modal {
       this.element.removeAttribute('hidden')
     }
 
-    this.template.querySelectorAll('.modally-close').forEach((el) => {
+    this.element.querySelectorAll('.modally-close').forEach((el) => {
       el.addEventListener('click', (e) => {
         e.preventDefault()
         this.modallyInstance.close(this, e.target)
       })
     })
 
-    landing.appendChild(this.template)
+    landing.appendChild(this.element)
     
-    this.zIndex = window.getComputedStyle(this.template).zIndex
+    this.zIndex = window.getComputedStyle(this.element).zIndex
   }
 
   setupVideoLanding() {
@@ -158,15 +162,15 @@ export class Modal {
 
     const landing = parseDOM('<div class="iframe-landing"></div>')
     landing.appendChild(spacer)
-    this.template.querySelector('.modally-content').appendChild(landing)
-    this.template.appendChild(embeds)
-    this.template.classList.add('video-embed')
+    this.element.querySelector('.modally-content').appendChild(landing)
+    this.element.appendChild(embeds)
+    this.element.classList.add('video-embed')
   }
 
   setupImageLanding() {
     const spacer = parseDOM('<div class="image-landing"><img style="width: 100%; height: auto;" decoding="async" loading="lazy" alt=""></div>')
-    this.template.querySelector('.modally-content').appendChild(spacer)
-    this.template.classList.add('image-embed')
+    this.element.querySelector('.modally-content').appendChild(spacer)
+    this.element.classList.add('image-embed')
   }
 
   getVideoId(link) {
@@ -187,8 +191,8 @@ export class Modal {
   mountVideo(link) {
     const vidData = this.getVideoId(link)
       
-    let template = this.template.querySelector(`.embed-template.template.${vidData.type}`)
-    const landing = this.template.querySelector('.modally-content .iframe-landing')
+    let template = this.element.querySelector(`.embed-template.template.${vidData.type}`)
+    const landing = this.element.querySelector('.modally-content .iframe-landing')
 
     if (!template || !landing) return
     template = template.cloneNode(true)
@@ -200,12 +204,12 @@ export class Modal {
   }
 
   unmountVideo() {
-    const iframe = this.template.querySelector('.modally-content iframe, .modally-content video')
+    const iframe = this.element.querySelector('.modally-content iframe, .modally-content video')
     if (iframe) iframe.remove()
   }
 
   mountImage(link, width, height, srcset) {
-    const img = this.template.querySelector('.modally-content img')
+    const img = this.element.querySelector('.modally-content img')
     if (!img) return
     img.setAttribute('src', link)
     img.style.display = 'block'
@@ -231,7 +235,7 @@ export class Modal {
 
     document.body.classList.add(`modally-${this.id}`)
     
-    fadeIn(this.template, () => {
+    fadeIn(this.element, () => {
       if (isFunction(callback)) callback(this)
     }, (elem) => {
       if (this.options.scrollToTop) elem.scrollTop = 0
@@ -243,13 +247,13 @@ export class Modal {
     if (!this.opened) return
     this.opened = false
 
-    fadeOut(this.template, () => {
+    fadeOut(this.element, () => {
       if (this.options.video) this.unmountVideo()
       document.body.classList.remove(`modally-${this.id}`)
 
       if (isFunction(callback)) callback(this)
 
-      css(this.template, {
+      css(this.element, {
         'zIndex': this.zIndex
       })
     })
@@ -260,7 +264,7 @@ export class Modal {
     this.target = target
 
     if (this.element) this.element.dispatchEvent(new CustomEvent(`modally:${eventName}`, { detail: this }))
-    this.template.dispatchEvent(new CustomEvent(`modally:${eventName}`, { detail: this }))
+    this.element.dispatchEvent(new CustomEvent(`modally:${eventName}`, { detail: this }))
     document.dispatchEvent(new CustomEvent(`modally:${eventName}`, { detail: this }))
     document.dispatchEvent(new CustomEvent(`modally:${eventName}:${this.id}`, { detail: this }))
   }
