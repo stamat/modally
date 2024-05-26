@@ -386,6 +386,8 @@ export class Modally {
     modal.dispatchEvents('added')
 
     if (modal.options.enableHashChange) this.modallyInitialHashCheck(id)
+
+    return modal
   }
 
   get(id) {
