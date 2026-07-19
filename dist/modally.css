@@ -50,6 +50,7 @@
   overflow: visible;
   cursor: pointer;
   background: transparent;
+  color: inherit;
   position: absolute;
   top: 0px;
   right: 0px;
