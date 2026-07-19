@@ -16,8 +16,6 @@ const browserGlobals = {
   setTimeout: 'readonly',
   clearTimeout: 'readonly',
   console: 'readonly',
-  jQuery: 'readonly',
-  $: 'readonly',
 }
 
 const nodeGlobals = {

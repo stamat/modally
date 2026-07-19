@@ -892,21 +892,5 @@
   if (typeof customElements !== "undefined") {
     defineModallyElement();
   }
-  if (window.hasOwnProperty("jQuery") || window.hasOwnProperty("$")) {
-    (function($2) {
-      $2.fn.modally = function(options) {
-        if (!window.hasOwnProperty("jQueryModally")) {
-          window.jQueryModally = new modally_default({
-            disableScroll: true,
-            selector: ".modally-init"
-          });
-        }
-        return this.each(function() {
-          options.element = this;
-          window.jQueryModally.add(this, options);
-        });
-      };
-    })(jQuery || $);
-  }
 })();
 //# sourceMappingURL=modally.js.map

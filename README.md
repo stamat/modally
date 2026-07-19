@@ -27,7 +27,7 @@ I created this web modal dialog library as a repo cause I wrote the same code fo
 * **Infinitely customizable** - go f**king wild 🎉
 * **Accessible** - follows the [WAI-ARIA APG dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/): focus moves into the dialog on open, is trapped while open, and returns to the trigger on close; `aria-labelledby`/`aria-describedby` are wired automatically
 * **Custom element** - use `<modally-dialog>` declaratively, no shadow DOM so your own CSS applies
-* **Framework agnostic** - no dependencies, fully native! You can use it with jQuery if you want to, `$(selector).modally(options)` a plugin is available if jQuery is present if you use this library as an IIFE script.
+* **Framework agnostic** - no dependencies, fully native!
 
 ## Installation
 
@@ -48,7 +48,7 @@ Use it as a module
 import Modally from 'modally';
 ```
 
-Or as an IIFE script, Modally will be available as a global class, or as a jQuery plugin if jQuery is present `$(selector).modally(options)`
+Or as an IIFE script, Modally will be available as a global class.
 
 
 ### CDN
