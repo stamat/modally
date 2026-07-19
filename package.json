@@ -4,6 +4,11 @@
   "description": "Simple ES6 nested modals",
   "main": "modally.mjs",
   "style": "modally.scss",
+  "scripts": {
+    "build": "poops -b",
+    "lint": "eslint .",
+    "test": "node --test test/*.test.mjs"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/stamat/modally.git"
@@ -25,6 +30,8 @@
     "url": "https://github.com/stamat/modally/issues"
   },
   "devDependencies": {
+    "eslint": "^10.7.0",
+    "jsdom": "^29.1.1",
     "poops": "^1.0.13"
   },
   "dependencies": {

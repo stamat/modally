@@ -31,7 +31,9 @@ const FOCUSABLE_SELECTOR = 'a[href], area[href], button:not([disabled]), input:n
 export function getFocusableElements(container) {
   if (!container) return []
   return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)).filter((el) => {
-    return el.offsetWidth > 0 || el.offsetHeight > 0 || el === document.activeElement
+    // Skip disabled controls and anything inside a [hidden] subtree (e.g. the
+    // pre-rendered video/image embed templates), which aren't tabbable.
+    return !el.hasAttribute('disabled') && !el.closest('[hidden]')
   })
 }
 
