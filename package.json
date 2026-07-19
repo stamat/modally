@@ -4,6 +4,19 @@
   "description": "Simple ES6 nested modals",
   "main": "modally.mjs",
   "style": "modally.scss",
+  "exports": {
+    ".": {
+      "import": "./modally.mjs",
+      "style": "./dist/modally.css",
+      "sass": "./modally.scss",
+      "default": "./modally.mjs"
+    },
+    "./dist/modally.js": "./dist/modally.js",
+    "./dist/modally.css": "./dist/modally.css",
+    "./dist/modally.min.css": "./dist/modally.min.css",
+    "./modally.scss": "./modally.scss",
+    "./package.json": "./package.json"
+  },
   "files": [
     "modally.mjs",
     "modally.scss",
