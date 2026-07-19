@@ -25,6 +25,8 @@ I created this web modal dialog library as a repo cause I wrote the same code fo
 * **ESC closable**
 * **Hash change detection** - automatic modal open on hash change
 * **Infinitely customizable** - go f**king wild 🎉
+* **Accessible** - follows the [WAI-ARIA APG dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/): focus moves into the dialog on open, is trapped while open, and returns to the trigger on close; `aria-labelledby`/`aria-describedby` are wired automatically
+* **Custom element** - use `<modally-dialog>` declaratively, no shadow DOM so your own CSS applies
 * **Framework agnostic** - no dependencies, fully native! You can use it with jQuery if you want to, `$(selector).modally(options)` a plugin is available if jQuery is present if you use this library as an IIFE script.
 
 ## Installation
@@ -82,6 +84,32 @@ const modally = new Modally();
 //turns your content into a modal, wraps it nicely
 modally.add('your-content');
 ```
+
+### Custom element
+
+Use the `<modally-dialog>` custom element to declare a modal in HTML with no JS wiring. It uses **no shadow DOM**, so your own stylesheet styles the content directly. Every attribute (except `id`) becomes a modal option (dash-case → camelCase, type-coerced).
+
+```html
+<modally-dialog id="greeting" max-width="600">
+  <h1>Hey there!</h1>
+  <p>Styled by your own CSS.</p>
+</modally-dialog>
+<a href="#greeting" target="_modal">Open</a>
+```
+
+When using the IIFE build, `<modally-dialog>` is registered automatically against a shared `Modally` singleton. To bind it to your own instance, call `Modally.defineElement('modally-dialog', myModally)` (or import `defineModallyElement` from the module build).
+
+### Accessibility
+
+Modally implements the [WAI-ARIA Authoring Practices dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/):
+
+* the dialog has `role="dialog"` and `aria-modal="true"`;
+* `aria-labelledby` is set from the first heading in your content (or `aria-label` falls back to the modal id), and `aria-describedby` from the first paragraph;
+* focus moves into the dialog on open and is trapped there with <kbd>Tab</kbd>/<kbd>Shift</kbd>+<kbd>Tab</kbd>;
+* focus returns to the triggering element on close;
+* <kbd>Esc</kbd> closes the top-most modal.
+
+Add `aria-haspopup="dialog"` to your trigger for the clearest screen-reader announcement. To override the auto-detected label, set `aria-labelledby`/`aria-label` (or mark a `[modally-title]` / `[modally-description]` element) yourself.
 
 ### Youtube and Vimeo modals
 
@@ -167,8 +195,8 @@ modally.add('hello-world');
 	<div class="modally-table">
 		<div class="modally-cell">
 			<div class="modally-underlay modally-close"></div>
-			<div class="modally" role="dialog" aria-modal="true">
-				<button tabindex="1" aria-label="Close" class="modally-close modally-close-button">&times;</button>
+			<div class="modally" role="dialog" aria-modal="true" tabindex="-1">
+				<button type="button" aria-label="Close" class="modally-close modally-close-button">&times;</button>
 				<div class="modally-content"></div>
 			</div>
 		</div>
