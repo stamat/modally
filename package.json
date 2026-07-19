@@ -4,6 +4,11 @@
   "description": "Simple ES6 nested modals",
   "main": "modally.mjs",
   "style": "modally.scss",
+  "files": [
+    "modally.mjs",
+    "modally.scss",
+    "dist"
+  ],
   "scripts": {
     "build": "poops -b",
     "lint": "eslint .",
