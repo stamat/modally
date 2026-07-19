@@ -393,6 +393,14 @@
   }
 
   // modally.mjs
+  var FOCUSABLE_SELECTOR = 'a[href], area[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), iframe, audio[controls], video[controls], [contenteditable], [tabindex]:not([tabindex="-1"])';
+  function getFocusableElements(container) {
+    if (!container)
+      return [];
+    return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)).filter((el) => {
+      return !el.hasAttribute("disabled") && !el.closest("[hidden]");
+    });
+  }
   var Modal = class {
     constructor(id, contentElement, options = {}, modallyInstance) {
       this.id = id;
@@ -423,8 +431,8 @@
           <div class="modally-table">
             <div class="modally-cell">
               <div class="modally-underlay modally-close"></div>
-              <div class="modally" role="dialog" aria-modal="true">
-                <button tabindex="1" class="modally-close modally-close-button" aria-label="Close">&times;</button>
+              <div class="modally" role="dialog" aria-modal="true" tabindex="-1">
+                <button type="button" class="modally-close modally-close-button" aria-label="Close">&times;</button>
                 <div class="modally-content"></div>
               </div>
             </div>
@@ -489,8 +497,64 @@
           this.modallyInstance.close(this, e.target);
         });
       });
+      this.dialog = this.template.querySelector(".modally");
+      this.setupAria();
+      this.template.addEventListener("keydown", (e) => this.trapFocus(e));
       landing.appendChild(this.template);
       this.zIndex = window.getComputedStyle(this.template).zIndex;
+    }
+    // Wire aria-labelledby/aria-describedby to the first heading and paragraph
+    // within the modal content, so screen readers announce the dialog properly.
+    setupAria() {
+      if (!this.dialog)
+        return;
+      const content = this.dialog.querySelector(".modally-content");
+      if (!content)
+        return;
+      if (!this.dialog.hasAttribute("aria-labelledby") && !this.dialog.hasAttribute("aria-label")) {
+        const heading = content.querySelector("h1, h2, h3, h4, h5, h6, [modally-title]");
+        if (heading) {
+          if (!heading.id)
+            heading.id = `${this.id}-modally-title`;
+          this.dialog.setAttribute("aria-labelledby", heading.id);
+        } else {
+          this.dialog.setAttribute("aria-label", this.id);
+        }
+      }
+      if (!this.dialog.hasAttribute("aria-describedby")) {
+        const desc = content.querySelector("p, [modally-description]");
+        if (desc) {
+          if (!desc.id)
+            desc.id = `${this.id}-modally-description`;
+          this.dialog.setAttribute("aria-describedby", desc.id);
+        }
+      }
+    }
+    trapFocus(e) {
+      if (e.key !== "Tab" || !this.opened)
+        return;
+      const focusable = getFocusableElements(this.dialog);
+      if (!focusable.length) {
+        e.preventDefault();
+        this.dialog.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === this.dialog)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+    focusDialog() {
+      const focusable = getFocusableElements(this.dialog);
+      const target = focusable.find((el) => !el.classList.contains("modally-close-button")) || focusable[0] || this.dialog;
+      if (target)
+        target.focus();
     }
     setupVideoLanding() {
       const spacer = parseDOM('<svg aria-hidden="true" style="width: 100%; height: auto; display: block;" width="1920" height="1080"></svg>');
@@ -564,6 +628,7 @@
       if (this.opened)
         return;
       this.opened = true;
+      this.previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       const dataset = target instanceof HTMLElement ? target.dataset : target;
       if (this.options.video && dataset && dataset.hasOwnProperty("video")) {
         this.mountVideo(dataset.video);
@@ -573,6 +638,7 @@
       }
       document.body.classList.add(`modally-${this.id}`);
       fadeIn(this.template, () => {
+        this.focusDialog();
         if (isFunction(callback))
           callback(this);
       }, (elem) => {
@@ -594,6 +660,10 @@
         css(this.template, {
           "zIndex": this.zIndex
         });
+        if (this.previouslyFocused && document.contains(this.previouslyFocused)) {
+          this.previouslyFocused.focus();
+        }
+        this.previouslyFocused = null;
       });
       return true;
     }
@@ -780,11 +850,47 @@
       }, "modallyHashCheckListenerInitialized");
     }
   };
+  var ModallyDialogElement = class _ModallyDialogElement extends HTMLElement {
+    connectedCallback() {
+      if (this._connected)
+        return;
+      this._connected = true;
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => this.register(), { once: true });
+      } else {
+        this.register();
+      }
+    }
+    register() {
+      if (this._registered)
+        return;
+      this._registered = true;
+      const modally = _ModallyDialogElement.modally || (_ModallyDialogElement.modally = new Modally());
+      const options = { element: this };
+      for (const attr of this.attributes) {
+        if (attr.name === "id")
+          continue;
+        options[transformDashToCamelCase(attr.name)] = stringToType(attr.value);
+      }
+      this.modal = modally.add(this.id, options);
+    }
+  };
+  function defineModallyElement(tag = "modally-dialog", modally) {
+    if (modally)
+      ModallyDialogElement.modally = modally;
+    if (typeof customElements !== "undefined" && !customElements.get(tag)) {
+      customElements.define(tag, ModallyDialogElement);
+    }
+  }
   var modally_default = Modally;
 
   // build/iife.js
+  modally_default.defineElement = defineModallyElement;
   if (!window.Modally) {
     window.Modally = modally_default;
+  }
+  if (typeof customElements !== "undefined") {
+    defineModallyElement();
   }
   if (window.hasOwnProperty("jQuery") || window.hasOwnProperty("$")) {
     (function($2) {
