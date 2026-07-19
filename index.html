@@ -213,6 +213,94 @@
       .down span {
         display: inline-block;
       }
+
+      /* GitHub-flavoured readme prose, scoped to .markdown-body */
+      .prose {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 60px 24px 100px;
+      }
+
+      .markdown-body {
+        color: #1f2328;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        word-wrap: break-word;
+      }
+
+      .markdown-body h1,
+      .markdown-body h2,
+      .markdown-body h3 {
+        margin-top: 32px;
+        margin-bottom: 16px;
+        font-weight: 600;
+        line-height: 1.25;
+      }
+
+      .markdown-body h1 { font-size: 2em; padding-bottom: 0.3em; border-bottom: 1px solid #d1d9e0; }
+      .markdown-body h2 { font-size: 1.5em; padding-bottom: 0.3em; border-bottom: 1px solid #d1d9e0; }
+      .markdown-body h3 { font-size: 1.25em; }
+
+      .markdown-body p,
+      .markdown-body ul { margin-top: 0; margin-bottom: 16px; }
+      .markdown-body ul { padding-left: 2em; }
+      .markdown-body li { margin-top: 0.25em; }
+
+      .markdown-body a { color: #0969da; text-decoration: none; }
+      .markdown-body a:hover { text-decoration: underline; }
+
+      .markdown-body code {
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+        font-size: 85%;
+        background-color: rgba(129,139,152,0.12);
+        border-radius: 6px;
+        padding: 0.2em 0.4em;
+      }
+
+      .markdown-body pre {
+        background-color: #f6f8fa;
+        border-radius: 6px;
+        padding: 16px;
+        overflow: auto;
+        font-size: 85%;
+        line-height: 1.45;
+        margin-bottom: 16px;
+      }
+
+      .markdown-body pre code {
+        background: transparent;
+        padding: 0;
+        font-size: 100%;
+      }
+
+      .markdown-body blockquote {
+        margin: 0 0 16px;
+        padding: 0 1em;
+        color: #59636e;
+        border-left: 0.25em solid #d1d9e0;
+      }
+
+      .markdown-body table {
+        border-collapse: collapse;
+        margin-bottom: 16px;
+        display: block;
+        overflow: auto;
+      }
+
+      .markdown-body th,
+      .markdown-body td {
+        border: 1px solid #d1d9e0;
+        padding: 6px 13px;
+      }
+
+      .markdown-body th { background-color: #f6f8fa; font-weight: 600; }
+      .markdown-body tr:nth-child(2n) { background-color: #f6f8fa; }
+
+      .markdown-body .try {
+        display: inline-block;
+        margin-bottom: 16px;
+      }
     </style>
 
     <link rel="stylesheet" href="dist/modally.css">
@@ -237,6 +325,66 @@
               <a href="#main" class="down"><span class="bounce">&darr;</span></a>
             </div>
           </div>
+        </section>
+
+        <section id="main" class="prose markdown-body">
+          <h1>Modally</h1>
+          <blockquote>Your trusty nested modal ally — simple, framework-agnostic modal dialogs with accessible focus management.</blockquote>
+
+          <p>Modally turns any hidden element into an accessible modal dialog. It follows the <a href="https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/">WAI-ARIA Authoring Practices dialog pattern</a>: focus moves into the dialog on open, is trapped inside while open, and returns to the trigger on close. <kbd>Esc</kbd> closes the top-most modal.</p>
+
+          <h2>Quick start</h2>
+          <p>Give your content an <code>id</code> and a link that targets it. Modally wraps the content in an accessible dialog for you.</p>
+          <pre><code>&lt;div id="hello" hidden&gt;&lt;h1&gt;Hello world!&lt;/h1&gt;&lt;/div&gt;
+&lt;a href="#hello" target="_modal"&gt;Open&lt;/a&gt;</code></pre>
+          <pre><code>const modally = new Modally()
+modally.add('hello')</code></pre>
+          <p><a class="button small try" href="#lorem" aria-haspopup="dialog" target="_modal">Try the demo modal</a></p>
+
+          <h2>Custom element <em>(no build, no JS wiring)</em></h2>
+          <p>Prefer HTML? Use the <code>&lt;modally-dialog&gt;</code> custom element. It uses <strong>no shadow DOM</strong>, so your own CSS styles the content directly. Every attribute becomes a modal option.</p>
+          <pre><code>&lt;modally-dialog id="greeting" max-width="600"&gt;
+  &lt;h1&gt;Hey there!&lt;/h1&gt;
+  &lt;p&gt;Styled by your own stylesheet — no piercing needed.&lt;/p&gt;
+&lt;/modally-dialog&gt;
+&lt;a href="#greeting" target="_modal"&gt;Open&lt;/a&gt;</code></pre>
+          <p><a class="button small try" href="#greeting" aria-haspopup="dialog" target="_modal">Try the custom element</a></p>
+
+          <h2>Nested modals</h2>
+          <p>Open a modal from inside another — Modally tracks the stack automatically and blurs the parent. No extra code.</p>
+          <pre><code>&lt;a href="#child" target="_modal"&gt;Open a nested modal&lt;/a&gt;</code></pre>
+
+          <h2>Video embeds</h2>
+          <p>Pass <code>video: true</code> and a <code>data-video</code> URL. YouTube, Vimeo and raw video files are detected and embedded automatically, with optional autoplay.</p>
+          <pre><code>modally.add('video-modal', { video: true })</code></pre>
+          <pre><code>&lt;a href="#video-modal" target="_modal"
+   data-video="https://www.youtube.com/watch?v=u9QJo5fBADE"&gt;Watch&lt;/a&gt;</code></pre>
+          <p><a class="button small try" href="#video-modal" aria-haspopup="dialog" target="_modal" data-video="https://www.youtube.com/watch?v=u9QJo5fBADE">Try a video modal</a></p>
+
+          <h2>Image lightbox</h2>
+          <p>Pass <code>image: true</code> and a <code>data-image</code> URL to open a responsive lightbox.</p>
+          <pre><code>modally.add('image-modal', { image: true })</code></pre>
+          <pre><code>&lt;a href="#image-modal" target="_modal"
+   data-image="/photo.jpg" data-width="800" data-height="1192"&gt;View&lt;/a&gt;</code></pre>
+
+          <h2>Options</h2>
+          <table>
+            <thead><tr><th>Option</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>maxWidth</code></td><td><code>'none'</code></td><td>Max width of the modal window (px).</td></tr>
+              <tr><td><code>disableScroll</code></td><td><code>true</code></td><td>Block body scroll while open.</td></tr>
+              <tr><td><code>verticalAlign</code></td><td><code>'middle'</code></td><td><code>middle</code>, <code>top</code> or <code>bottom</code>.</td></tr>
+              <tr><td><code>closeOthers</code></td><td><code>false</code></td><td>Close other open modals on open.</td></tr>
+              <tr><td><code>video</code> / <code>image</code></td><td><code>false</code></td><td>Enable video embed / image lightbox.</td></tr>
+            </tbody>
+          </table>
+          <p>See the <a href="https://github.com/stamat/modally#properties">README</a> for the full list. Options can also be set via <code>modally-&lt;option&gt;</code> attributes on the element.</p>
+
+          <h2>Events</h2>
+          <p>Modally dispatches lifecycle events on <code>document</code>: <code>modally:open</code>, <code>modally:opened</code>, <code>modally:close</code>, <code>modally:closed</code> and <code>modally:added</code> — each with the modal instance in <code>event.detail</code>.</p>
+          <pre><code>document.addEventListener('modally:opened', (e) =&gt; {
+  console.log(e.detail.id)
+})</code></pre>
         </section>
 
         <div id="lorem" hidden class="modally-init" modally-max-width="1000">
@@ -265,6 +413,14 @@
           </div>
         </div>
 
+        <modally-dialog id="greeting" hidden max-width="600">
+          <h1 class="modal-title">Hey there! 👋</h1>
+          <p>This modal is declared with the <code>&lt;modally-dialog&gt;</code> custom element. No shadow DOM — your own CSS styles it directly.</p>
+          <div class="button-wrap">
+            <a target="_modal:close" class="button small">Close me!</a>
+          </div>
+        </modally-dialog>
+
         <div class="browserstack">Tested with <a href="https://browserstack.com"><img style="height: 30px;" src="https://imgur.com/LFUFTyF.png" alt="BrowserStack" /></a></div>
       </main>
     </div>
@@ -273,7 +429,10 @@
         disableScroll: true,
         selector: '.modally-init',
       })
-      
+
+      // Bind the <modally-dialog> custom element to this same instance.
+      Modally.defineElement('modally-dialog', modally)
+
       modally.add('ipsum', {
         maxWidth: 800,
       })

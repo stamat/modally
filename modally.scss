@@ -52,6 +52,7 @@
   cursor: pointer;
 
   background: transparent;
+  color: inherit;
 
 	position: absolute;
   top: 0px;
@@ -76,6 +77,17 @@
 .modally .modally-close-button::-moz-focus-inner {
   border: 0;
   padding: 0;
+}
+
+/* Visible keyboard focus indicator for accessibility */
+.modally:focus {
+  outline: none;
+}
+
+.modally .modally-close-button:focus-visible,
+.modally :focus-visible {
+  outline: 2px solid #1d1d1d;
+  outline-offset: 2px;
 }
 
 .modally-table {
