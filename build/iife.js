@@ -1,5 +1,9 @@
 import Modally, { defineModallyElement } from "../modally.mjs";
 
+// Expose the element registrar so callers can bind their own Modally instance:
+// Modally.defineElement('modally-dialog', myModally)
+Modally.defineElement = defineModallyElement;
+
 if (!window.Modally) {
   window.Modally = Modally;
 }
