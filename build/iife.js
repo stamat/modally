@@ -1,7 +1,12 @@
-import Modally from "../modally.mjs";
+import Modally, { defineModallyElement } from "../modally.mjs";
 
 if (!window.Modally) {
   window.Modally = Modally;
+}
+
+// Register the <modally-dialog> custom element for zero-JS declarative usage.
+if (typeof customElements !== "undefined") {
+  defineModallyElement();
 }
 
 if (window.hasOwnProperty("jQuery") || window.hasOwnProperty("$")) {

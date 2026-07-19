@@ -536,4 +536,48 @@ export class Modally {
   }
 }
 
+// Custom element wrapper. No shadow DOM on purpose: the light-DOM children stay
+// the modal content so the author's own CSS applies without ::part or piercing.
+//
+//   <modally-dialog id="hello" max-width="800"><h1>Hi</h1></modally-dialog>
+//   <a href="#hello" target="_modal">Open</a>
+//
+// Every attribute (except id) becomes a modal option, dash-case -> camelCase and
+// coerced to its type ("800" -> 800, "true" -> true), matching modally-* attrs.
+export class ModallyDialogElement extends HTMLElement {
+  connectedCallback() {
+    if (this._connected) return
+    this._connected = true
+    // Children may not be parsed yet when the tag is upgraded during parsing.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.register(), { once: true })
+    } else {
+      this.register()
+    }
+  }
+
+  register() {
+    if (this._registered) return
+    this._registered = true
+
+    const modally = ModallyDialogElement.modally || (ModallyDialogElement.modally = new Modally())
+    const options = { element: this }
+    for (const attr of this.attributes) {
+      if (attr.name === 'id') continue
+      options[transformDashToCamelCase(attr.name)] = stringToType(attr.value)
+    }
+
+    this.modal = modally.add(this.id, options)
+  }
+}
+
+// Register <modally-dialog> (or a custom tag). Pass a Modally instance to reuse
+// yours; otherwise a shared singleton is created lazily on first connect.
+export function defineModallyElement(tag = 'modally-dialog', modally) {
+  if (modally) ModallyDialogElement.modally = modally
+  if (typeof customElements !== 'undefined' && !customElements.get(tag)) {
+    customElements.define(tag, ModallyDialogElement)
+  }
+}
+
 export default Modally
