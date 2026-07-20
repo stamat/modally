@@ -39,6 +39,34 @@ test('getFocusableElements returns tabbable elements, skips disabled and [hidden
   assert.deepEqual(tags, ['button', 'a', 'input'])
 })
 
+test('trapFocus wraps Tab at the last element and Shift+Tab at the first', () => {
+  const el = document.createElement('div')
+  el.id = 'trap'
+  el.setAttribute('hidden', '')
+  el.innerHTML = '<h1>Trap</h1><a href="#">one</a><a href="#">two</a>'
+  document.body.appendChild(el)
+
+  const modally = new Modally()
+  const modal = modally.add('trap')
+  modal.opened = true // trapFocus is a no-op unless the modal is open
+
+  const focusable = getFocusableElements(modal.dialog)
+  const first = focusable[0]
+  const last = focusable[focusable.length - 1]
+
+  last.focus()
+  let prevented = false
+  modal.trapFocus({ key: 'Tab', shiftKey: false, preventDefault: () => { prevented = true } })
+  assert.ok(prevented, 'Tab on the last element is prevented')
+  assert.equal(document.activeElement, first, 'Tab wraps to the first element')
+
+  first.focus()
+  prevented = false
+  modal.trapFocus({ key: 'Tab', shiftKey: true, preventDefault: () => { prevented = true } })
+  assert.ok(prevented, 'Shift+Tab on the first element is prevented')
+  assert.equal(document.activeElement, last, 'Shift+Tab wraps to the last element')
+})
+
 test('modal wires role, aria-modal and aria-labelledby to its heading', () => {
   const el = document.createElement('div')
   el.id = 'about'
